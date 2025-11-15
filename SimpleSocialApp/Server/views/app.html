@@ -7,5 +7,18 @@
 </head>
 <body>
     <h1>For Posting Content</h1>
+    <nav>
+        <a href="login">Login</a>
+        <a href="logout">logout</a>
+        <a href="register">Register</a>
+        <a href="app">App</a>
+    </nav>
+
+    <form action="/newpost" method="POST">
+        <label>Message</label>
+        <input type="text" id="message" name="message">
+        <input type="submit" value="post message">
+    </form>
+    
 </body>
 </html>
