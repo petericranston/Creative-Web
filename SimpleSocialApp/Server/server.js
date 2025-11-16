@@ -8,6 +8,7 @@ const posts=require('./models/posts.js');
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Index file served
 app.get("/", (req, res) => {
@@ -30,8 +31,13 @@ app.get("/register", (request, response)=> {
     response.sendFile(path.join(__dirname, '/views', '/register.html'));
 });
 
+app.get('/getposts', (request, response) => {
+    response.json({posts: posts.getPosts()}) 
+}) 
+
 app.post('/newpost', (request, response) => {
-    posts.addPost(request.body.message, "UserName");
+    posts.addPost(request.body.message, "Users Name");
+    response.sendFile(path.join(__dirname, '/views', '/app.html'));
     console.log("Message Sent");
 });
 
