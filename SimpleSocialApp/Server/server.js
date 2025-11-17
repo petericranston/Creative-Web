@@ -30,19 +30,19 @@ app.get("/", (request, response) => {
 });
 
 app.get("/app", (request, response)=> {
-    response.sendFile(path.join(__dirname, '/views', '/app.html'));
+    response.sendFile(path.join(__dirname, '/views', 'app.html'));
 });
 
 app.get("/login", (request, response)=> {
-    response.sendFile(path.join(__dirname, '/views', '/login.html'));
+    response.sendFile(path.join(__dirname, '/views', 'login.html'));
 });
 
 app.get("/logout", (request, response)=> {
-    response.sendFile(path.join(__dirname, '/views', '/logout.html'));
+    response.sendFile(path.join(__dirname, '/views', 'logout.html'));
 });
 
 app.get("/register", (request, response)=> {
-    response.sendFile(path.join(__dirname, '/views', '/register.html'));
+    response.sendFile(path.join(__dirname, '/views', 'register.html'));
 });
 
 app.get('/getposts', (request, response) => {
@@ -52,7 +52,7 @@ app.get('/getposts', (request, response) => {
 app.post('/newpost', (request, response) => {
     if(request.body.message != ""){
        posts.addPost(request.body.message, request.session.username);
-        response.sendFile(path.join(__dirname, '/views', '/app.html'));
+        response.sendFile(path.join(__dirname, '/views', 'app.html'));
         console.log("Message Sent");
     }
 });
@@ -60,15 +60,15 @@ app.post('/newpost', (request, response) => {
 app.post('/register', (request, response) => {
     userModel.registerUser(request.body.username, request.body.password);
     request.session.username=request.body.username;
-    response.sendFile(path.join(__dirname, '/views', '/app.html'));
+    response.sendFile(path.join(__dirname, '/views', 'app.html'));
 })
 
 app.post('/login', (request, response)=> {
     if(userModel.checkUser(request.body.username, request.body.password)){
         request.session.username=request.body.username;
-        response.sendFile(path.join(__dirname, '/views', '/app.html'));
+        response.sendFile(path.join(__dirname, '/views', 'app.html'));
     }else{
-        response.sendFile(path.join(__dirname, '/views', '/login_failed.html'));
+        response.sendFile(path.join(__dirname, '/views', 'login_failed.html'));
     }
 })
 

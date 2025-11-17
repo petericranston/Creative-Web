@@ -1,4 +1,3 @@
-const { model } = require("mongoose");
 
 let userData = [
     {
@@ -27,12 +26,11 @@ function registerUser(username, password){
 }
 
 function checkUser(username, password){
-    let found = userData(user=>user.username === username)
-    if(found){
-        return found.password==password
-    }else{
+    let found = userData.find(user=>user.username === username)
+    if(!found){
         return false;
     }
+    return found.password===password;
 }
 
 module.exports ={
