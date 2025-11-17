@@ -1,3 +1,5 @@
+const { model } = require("mongoose");
+
 let nextPostID = 2;
 let postData =[
     {
