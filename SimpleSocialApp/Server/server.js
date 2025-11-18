@@ -26,15 +26,10 @@ app.use(
   })
 );
 
-// Index file served first
-app.get("/", (request, response) => {
-  response.sendFile(path.join(__dirname, "../Client/index.html"));
-});
-
-app.get("/app", (request, response) => {
+function checkLoggedIn(request, response, nextAction) {
   if (request.session) {
     if (request.session.username) {
-      response.sendFile(path.join(__dirname, "/views", "app.html"));
+      nextAction();
     } else {
       request.session.destroy();
       response.sendFile(path.join(__dirname, "/views", "notloggedin.html"));
@@ -43,6 +38,15 @@ app.get("/app", (request, response) => {
     request.session.destroy();
     response.sendFile(path.join(__dirname, "/views", "notloggedin.html"));
   }
+}
+
+// Index file served first
+app.get("/", (request, response) => {
+  response.sendFile(path.join(__dirname, "../Client/index.html"));
+});
+
+app.get("/app", checkLoggedIn, (request, response) => {
+  response.sendFile(path.join(__dirname, "/views", "app.html"));
 });
 
 app.get("/login", (request, response) => {
@@ -51,7 +55,7 @@ app.get("/login", (request, response) => {
 
 app.get("/logout", (request, response) => {
   response.sendFile(path.join(__dirname, "/views", "logout.html"));
-  request.session.username = "";
+  request.session.destroy();
 });
 
 app.get("/register", (request, response) => {
@@ -62,7 +66,7 @@ app.get("/getposts", (request, response) => {
   response.json({ posts: posts.getPosts() });
 });
 
-app.post("/newpost", (request, response) => {
+app.post("/newpost", checkLoggedIn, (request, response) => {
   if (request.body.message != "") {
     posts.addPost(request.body.message, request.session.username);
     response.sendFile(path.join(__dirname, "/views", "app.html"));
