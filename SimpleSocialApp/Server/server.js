@@ -63,7 +63,7 @@ app.get("/register", (request, response) => {
 });
 
 app.get("/getposts", (request, response) => {
-  response.json({ posts: posts.getPosts() });
+  response.json({ posts: posts.getLatestNPost(8) });
 });
 
 app.post("/newpost", checkLoggedIn, (request, response) => {
