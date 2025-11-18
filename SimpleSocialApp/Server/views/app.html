@@ -1,45 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Main App</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>For Posting Content</h1>
     <nav>
-        <a href="login">Login</a>
-        <a href="logout">logout</a>
-        <a href="register">Register</a>
-        <a href="app">App</a>
+      <a href="login">Login</a>
+      <a href="logout">logout</a>
+      <a href="register">Register</a>
+      <a href="app">App</a>
     </nav>
 
+    <h4>New Post</h4>
+
     <form action="/newpost" method="POST">
-        <label>Message</label>
-        <input type="text" id="message" name="message">
-        <input type="submit" value="post message">
+      <label>Message</label>
+      <input type="text" id="message" name="message" />
+      <input type="submit" value="post message" />
     </form>
 
     <h4>Recent Posts</h4>
     <ul id="recent-posts"></ul>
 
     <script>
-        const recentPosts = document.getElementById('recent-posts');
+      const recentPosts = document.getElementById("recent-posts");
 
-        fetch('/getposts')
-        .then(response=>response.json())
-        .then(processData)
+      fetch("/getposts")
+        .then((response) => response.json())
+        .then(processData);
 
-        function processData(data){
-            console.log(data);
-            recentPosts.innerHTML="";
-            data.posts.forEach(post=> {
-                let li=document.createElement('li');
-                li.innerText=`${post.message} by user: ${post.user}`
-                recentPosts.appendChild(li)
-            })
-        }
+      function processData(data) {
+        console.log(data);
+        recentPosts.innerHTML = "";
+        data.posts.forEach((post) => {
+          let li = document.createElement("li");
+          li.innerText = `${post.message} by user: ${post.user}`;
+          recentPosts.appendChild(li);
+        });
+      }
     </script>
-
-</body>
+  </body>
 </html>

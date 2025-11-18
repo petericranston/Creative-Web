@@ -32,7 +32,17 @@ app.get("/", (request, response) => {
 });
 
 app.get("/app", (request, response) => {
-  response.sendFile(path.join(__dirname, "/views", "app.html"));
+  if (request.session) {
+    if (request.session.username) {
+      response.sendFile(path.join(__dirname, "/views", "app.html"));
+    } else {
+      request.session.destroy();
+      response.sendFile(path.join(__dirname, "/views", "notloggedin.html"));
+    }
+  } else {
+    request.session.destroy();
+    response.sendFile(path.join(__dirname, "/views", "notloggedin.html"));
+  }
 });
 
 app.get("/login", (request, response) => {
