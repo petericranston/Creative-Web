@@ -60,6 +60,14 @@ app.get("/app", checkLoggedIn, (request, response) => {
   response.sendFile(path.join(__dirname, "/views", "app.html"));
 });
 
+app.get("/register", (request, response) => {
+  response.sendFile(path.join(__dirname, "/views", "register.html"));
+});
+
+app.get("/profile", (request, response) => {
+  response.sendFile(path.join(__dirname, "/views", "profile.html"));
+});
+
 app.get("/login", (request, response) => {
   response.sendFile(path.join(__dirname, "/views", "login.html"));
 });
@@ -67,10 +75,6 @@ app.get("/login", (request, response) => {
 app.get("/logout", (request, response) => {
   response.sendFile(path.join(__dirname, "/views", "logout.html"));
   request.session.destroy();
-});
-
-app.get("/register", (request, response) => {
-  response.sendFile(path.join(__dirname, "/views", "register.html"));
 });
 
 app.get("/getposts", async (request, response) => {
