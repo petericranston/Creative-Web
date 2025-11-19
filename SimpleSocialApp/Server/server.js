@@ -53,13 +53,24 @@ function checkLoggedIn(request, response, nextAction) {
   }
 }
 
+function getLoggedInState(request) {
+  return request.session && request.session.username;
+}
+
 // Index file served first
 app.get("/", (request, response) => {
   response.sendFile(path.join(__dirname, "../Client/index.html"));
 });
 
+app.get("/home", (request, response) => {
+  response.sendFile(path.join(__dirname, "../Client", "index.html"));
+});
+
 app.get("/app", checkLoggedIn, (request, response) => {
-  response.sendFile(path.join(__dirname, "/views", "app.html"));
+  // response.sendFile(path.join(__dirname, "/views", "app.html"));
+  response.render("pages/app", {
+    isLoggedIn: getLoggedInState(request),
+  });
 });
 
 app.get("/register", (request, response) => {
@@ -72,7 +83,9 @@ app.get("/profile", (request, response) => {
 
 app.get("/login", (request, response) => {
   // response.sendFile(path.join(__dirname, "/views", "login.html"));
-  response.render("pages/login", {});
+  response.render("pages/login", {
+    isLoggedIn: getLoggedInState(request),
+  });
 });
 
 app.get("/logout", (request, response) => {
@@ -87,7 +100,10 @@ app.get("/getposts", async (request, response) => {
 app.post("/newpost", checkLoggedIn, (request, response) => {
   if (request.body.message != "") {
     posts.addPost(request.body.message, request.session.username);
-    response.sendFile(path.join(__dirname, "/views", "app.html"));
+    // response.sendFile(path.join(__dirname, "/views", "app.html"));
+    response.render("pages/app", {
+      isLoggedIn: getLoggedInState(request),
+    });
     console.log("Message Sent");
   }
 });
@@ -95,13 +111,19 @@ app.post("/newpost", checkLoggedIn, (request, response) => {
 app.post("/register", async (request, response) => {
   await userModel.registerUser(request.body.username, request.body.password);
   request.session.username = request.body.username;
-  response.sendFile(path.join(__dirname, "/views", "app.html"));
+  // response.sendFile(path.join(__dirname, "/views", "app.html"));
+  response.render("pages/app", {
+    isLoggedIn: getLoggedInState(request),
+  });
 });
 
 app.post("/login", async (request, response) => {
   if (await userModel.checkUser(request.body.username, request.body.password)) {
     request.session.username = request.body.username;
-    response.sendFile(path.join(__dirname, "/views", "app.html"));
+    // response.sendFile(path.join(__dirname, "/views", "app.html"));
+    response.render("pages/app", {
+      isLoggedIn: getLoggedInState(request),
+    });
   } else {
     response.sendFile(path.join(__dirname, "/views", "login_failed.html"));
   }
