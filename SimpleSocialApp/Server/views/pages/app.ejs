@@ -12,9 +12,15 @@
   </form>
 
   <h4>Recent Posts</h4>
-  <ul id="recent-posts"></ul>
+  <ul id="recent-posts">
+    <% posts.forEach(post => { %>
+    <li>
+      <p>Message: <%= post.message %> by: <%= post.user %></p>
+    </li>
+    <% }) %>
+  </ul>
 
-  <script>
+  <!-- <script>
     const recentPosts = document.getElementById("recent-posts");
 
     fetch("/getposts")
@@ -30,7 +36,7 @@
         recentPosts.appendChild(li);
       });
     }
-  </script>
+  </script> -->
 
   <a href="logout">logout</a>
 </body>

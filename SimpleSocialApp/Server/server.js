@@ -66,10 +66,11 @@ app.get("/home", (request, response) => {
   response.sendFile(path.join(__dirname, "../Client", "index.html"));
 });
 
-app.get("/app", checkLoggedIn, (request, response) => {
+app.get("/app", checkLoggedIn, async (request, response) => {
   // response.sendFile(path.join(__dirname, "/views", "app.html"));
   response.render("pages/app", {
     isLoggedIn: getLoggedInState(request),
+    posts: await posts.getLatestNPost(8),
   });
 });
 
@@ -97,15 +98,16 @@ app.get("/getposts", async (request, response) => {
   response.json({ posts: await posts.getLatestNPost(8) });
 });
 
-app.post("/newpost", checkLoggedIn, (request, response) => {
-  if (request.body.message != "") {
-    posts.addPost(request.body.message, request.session.username);
-    // response.sendFile(path.join(__dirname, "/views", "app.html"));
-    response.render("pages/app", {
-      isLoggedIn: getLoggedInState(request),
-    });
-    console.log("Message Sent");
-  }
+app.post("/newpost", checkLoggedIn, async (request, response) => {
+  await posts.addPost(request.body.message, request.session.username);
+  const latestPosts = await posts.getLatestNPost(8);
+
+  // response.sendFile(path.join(__dirname, "/views", "app.html"));
+  response.render("pages/app", {
+    isLoggedIn: getLoggedInState(request),
+    posts: latestPosts,
+  });
+  console.log("Message Sent");
 });
 
 app.post("/register", async (request, response) => {
@@ -114,6 +116,7 @@ app.post("/register", async (request, response) => {
   // response.sendFile(path.join(__dirname, "/views", "app.html"));
   response.render("pages/app", {
     isLoggedIn: getLoggedInState(request),
+    posts: await posts.getLatestNPost(8),
   });
 });
 
@@ -123,6 +126,7 @@ app.post("/login", async (request, response) => {
     // response.sendFile(path.join(__dirname, "/views", "app.html"));
     response.render("pages/app", {
       isLoggedIn: getLoggedInState(request),
+      posts: await posts.getLatestNPost(8),
     });
   } else {
     response.sendFile(path.join(__dirname, "/views", "login_failed.html"));
