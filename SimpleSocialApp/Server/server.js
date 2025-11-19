@@ -14,6 +14,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.set("view engine", "ejs");
+
 const threeMinutes = 3 * 60 * 1000;
 const oneHour = 1 * 60 * 60 * 1000;
 
@@ -69,7 +71,8 @@ app.get("/profile", (request, response) => {
 });
 
 app.get("/login", (request, response) => {
-  response.sendFile(path.join(__dirname, "/views", "login.html"));
+  // response.sendFile(path.join(__dirname, "/views", "login.html"));
+  response.render("pages/login", {});
 });
 
 app.get("/logout", (request, response) => {
