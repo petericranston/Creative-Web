@@ -1,34 +1,53 @@
-const { model, get } = require("mongoose");
+// let nextPostID = 2;
+// let postData = [
+//   {
+//     postID: 0,
+//     message: "Hello its Peter",
+//     user: "Peter",
+//   },
+//   {
+//     postID: 1,
+//     message: "Glad its thursday",
+//     user: "Jack",
+//   },
+// ];
 
-let nextPostID = 2;
-let postData = [
-  {
-    postID: 0,
-    message: "Hello its Peter",
-    user: "Peter",
-  },
-  {
-    postID: 1,
-    message: "Glad its thursday",
-    user: "Jack",
-  },
-];
+const mongoose = require("mongoose");
+
+const { Schema, model } = mongoose;
+
+const postSchema = new Schema({
+  user: String,
+  message: String,
+  likes: Number,
+  time: Date,
+});
+
+const postData = model("posts", postSchema);
 
 function getPosts() {
-  return postData.slice();
+  let foundData = [];
+  foundData = postData.find({});
+  return foundData;
 }
 
-function getLatestNPost(n = 2) {
-  return postData.slice(-n).reverse();
+async function getLatestNPost(n = 2) {
+  let foundData = [];
+  foundData = await postData.find({}).sort({ time: -1 }).limit(n).exec();
+  return foundData;
 }
 
 function addPost(message, user) {
   let newPost = {
-    postID: nextPostID++,
-    message: message,
     user: user,
+    message: message,
+    likes: 0,
+    time: Date.now(),
   };
-  postData.push(newPost);
+
+  postData.create(newPost).catch((err) => {
+    console.log("Error", err);
+  });
 }
 
 module.exports = {

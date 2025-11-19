@@ -17,6 +17,17 @@ app.use(express.urlencoded({ extended: true }));
 const threeMinutes = 3 * 60 * 1000;
 const oneHour = 1 * 60 * 60 * 1000;
 
+const dotenv = require("dotenv").config();
+
+const mongoDBUsername = process.env.mongoDBUsername;
+const mongoDBPassword = process.env.mongoDBPassword;
+const mongoAppName = process.env.mongoAppName;
+
+const connectionString = `mongodb+srv://${mongoDBUsername}:${mongoDBPassword}@cluster0.hxdji7a.mongodb.net/${mongoAppName}?retryWrites=true&w=majority`;
+
+const mongoose = require("mongoose");
+mongoose.connect(connectionString);
+
 app.use(
   sessions({
     secret: "my secret phrase",
@@ -62,8 +73,8 @@ app.get("/register", (request, response) => {
   response.sendFile(path.join(__dirname, "/views", "register.html"));
 });
 
-app.get("/getposts", (request, response) => {
-  response.json({ posts: posts.getLatestNPost(8) });
+app.get("/getposts", async (request, response) => {
+  response.json({ posts: await posts.getLatestNPost(8) });
 });
 
 app.post("/newpost", checkLoggedIn, (request, response) => {
@@ -74,14 +85,14 @@ app.post("/newpost", checkLoggedIn, (request, response) => {
   }
 });
 
-app.post("/register", (request, response) => {
-  userModel.registerUser(request.body.username, request.body.password);
+app.post("/register", async (request, response) => {
+  await userModel.registerUser(request.body.username, request.body.password);
   request.session.username = request.body.username;
   response.sendFile(path.join(__dirname, "/views", "app.html"));
 });
 
-app.post("/login", (request, response) => {
-  if (userModel.checkUser(request.body.username, request.body.password)) {
+app.post("/login", async (request, response) => {
+  if (await userModel.checkUser(request.body.username, request.body.password)) {
     request.session.username = request.body.username;
     response.sendFile(path.join(__dirname, "/views", "app.html"));
   } else {
