@@ -45,11 +45,10 @@ function checkLoggedIn(request, response, nextAction) {
       nextAction();
     } else {
       request.session.destroy();
-      response.sendFile(path.join(__dirname, "/views", "notloggedin.html"));
+      response.render("pages/notloggedin", {
+        isLoggedIn: getLoggedInState(request),
+      });
     }
-  } else {
-    request.session.destroy();
-    response.sendFile(path.join(__dirname, "/views", "notloggedin.html"));
   }
 }
 
@@ -75,11 +74,15 @@ app.get("/app", checkLoggedIn, async (request, response) => {
 });
 
 app.get("/register", (request, response) => {
-  response.sendFile(path.join(__dirname, "/views", "register.html"));
+  response.render("pages/register", {
+    isLoggedIn: getLoggedInState(request),
+  });
 });
 
 app.get("/profile", (request, response) => {
-  response.sendFile(path.join(__dirname, "/views", "profile.html"));
+  response.render("pages/profile", {
+    isLoggedIn: getLoggedInState(request),
+  });
 });
 
 app.get("/login", (request, response) => {
@@ -90,7 +93,9 @@ app.get("/login", (request, response) => {
 });
 
 app.get("/logout", (request, response) => {
-  response.sendFile(path.join(__dirname, "/views", "logout.html"));
+  response.render("pages/logout", {
+    isLoggedIn: getLoggedInState(request),
+  });
   request.session.destroy();
 });
 
@@ -129,7 +134,9 @@ app.post("/login", async (request, response) => {
       posts: await posts.getLatestNPost(8),
     });
   } else {
-    response.sendFile(path.join(__dirname, "/views", "login_failed.html"));
+    response.render("pages/login_failed", {
+      isLoggedIn: getLoggedInState(request),
+    });
   }
 });
 
