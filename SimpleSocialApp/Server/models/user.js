@@ -17,6 +17,7 @@ const { Schema, model } = mongoose;
 const userSchema = new Schema({
   username: String,
   password: String,
+  admin: Boolean,
 });
 
 const userData = model("users", userSchema);
@@ -31,6 +32,7 @@ async function registerUser(username, password) {
     await userData.create({
       username: username,
       password: password,
+      admin: false,
     });
 
     return true;
