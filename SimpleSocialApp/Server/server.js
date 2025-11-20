@@ -114,10 +114,7 @@ app.post("/newpost", checkLoggedIn, async (request, response) => {
   const latestPosts = await posts.getLatestNPost(8);
 
   // response.sendFile(path.join(__dirname, "/views", "app.html"));
-  response.render("pages/app", {
-    isLoggedIn: getLoggedInState(request),
-    posts: latestPosts,
-  });
+  response.redirect("/app");
   console.log("Message Sent");
 });
 
@@ -125,10 +122,7 @@ app.post("/register", async (request, response) => {
   await userModel.registerUser(request.body.username, request.body.password);
   request.session.username = request.body.username;
   // response.sendFile(path.join(__dirname, "/views", "app.html"));
-  response.render("pages/app", {
-    isLoggedIn: getLoggedInState(request),
-    posts: await posts.getLatestNPost(8),
-  });
+  response.redirect("/app");
 });
 
 app.post("/updateDetails", async (request, response) => {
@@ -139,19 +133,14 @@ app.post("/updateDetails", async (request, response) => {
   );
   request.session.username = request.body.username;
   // response.sendFile(path.join(__dirname, "/views", "app.html"));
-  response.render("pages/profile", {
-    isLoggedIn: getLoggedInState(request),
-  });
+  response.redirect("/profile");
 });
 
 app.post("/login", async (request, response) => {
   if (await userModel.checkUser(request.body.username, request.body.password)) {
     request.session.username = request.body.username;
     // response.sendFile(path.join(__dirname, "/views", "app.html"));
-    response.render("pages/app", {
-      isLoggedIn: getLoggedInState(request),
-      posts: await posts.getLatestNPost(8),
-    });
+    response.redirect("/app");
   } else {
     response.render("pages/login_failed", {
       isLoggedIn: getLoggedInState(request),
