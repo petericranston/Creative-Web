@@ -5,5 +5,13 @@
   <h1>Simple Social App</h1>
   <h2><%= username %></h2>
   <%- include('../partials/nav') %>
+
+  <h3>Update Details</h3>
+  <form action="/updateDetails" method="POST">
+    <label>Update Details</label>
+    <input type="text" id="username" name="username" />
+    <input type="text" id="password" name="password" />
+    <input type="submit" value="updateDetails" />
+  </form>
 </body>
 <%- include('../partials/footer') %>

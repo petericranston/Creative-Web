@@ -9,6 +9,7 @@
 //   },
 // ];
 
+const { resolveInclude } = require("ejs");
 const mongoose = require("mongoose");
 
 const { Schema, model } = mongoose;
@@ -47,7 +48,25 @@ async function checkUser(username, password) {
   return existing.password === password;
 }
 
+async function updateDetails(username, password, currentUsername) {
+  try {
+    const updating = await userData.updateOne(
+      { username: currentUsername },
+      {
+        $set: {
+          username: username,
+          password: password,
+        },
+      }
+    );
+  } catch (err) {
+    console.log("Error:", err);
+    return false;
+  }
+}
+
 module.exports = {
   registerUser,
   checkUser,
+  updateDetails,
 };

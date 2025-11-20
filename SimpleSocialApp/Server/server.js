@@ -131,6 +131,19 @@ app.post("/register", async (request, response) => {
   });
 });
 
+app.post("/updateDetails", async (request, response) => {
+  await userModel.updateDetails(
+    request.body.username,
+    request.body.password,
+    request.session.username
+  );
+  request.session.username = request.body.username;
+  // response.sendFile(path.join(__dirname, "/views", "app.html"));
+  response.render("pages/profile", {
+    isLoggedIn: getLoggedInState(request),
+  });
+});
+
 app.post("/login", async (request, response) => {
   if (await userModel.checkUser(request.body.username, request.body.password)) {
     request.session.username = request.body.username;
