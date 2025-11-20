@@ -1,0 +1,38 @@
+body {
+  background-color: #00ddff;
+  text-align: center;
+}
+
+h1 {
+  font-size: 40px;
+}
+
+h2 {
+  font-size: 30px;
+}
+
+h3 {
+  font-size: 25px;
+}
+
+nav {
+  font-size: 30px;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+}
+
+input {
+  font-size: 25px;
+  border-radius: 15px;
+}
+
+label {
+  font-size: 40px;
+}
+
+li {
+  font-size: 20px;
+  list-style-type: none;
+}
