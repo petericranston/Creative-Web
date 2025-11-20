@@ -17,21 +17,24 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.set("view engine", "ejs");
 
-const threeMinutes = 3 * 60 * 1000;
+//All the organisational requirements and requirements above
+
+const threeMinutes = 3 * 60 * 1000; //Variables to decide how long the user will be singed in for
 const oneHour = 1 * 60 * 60 * 1000;
 
-const dotenv = require("dotenv").config();
+const dotenv = require("dotenv").config(); //Configuring my .env for secret keys (mongodb)
 
-const mongoDBUsername = process.env.mongoDBUsername;
+const mongoDBUsername = process.env.mongoDBUsername; //Getting data from env file
 const mongoDBPassword = process.env.mongoDBPassword;
 const mongoAppName = process.env.mongoAppName;
 
 const connectionString = `mongodb+srv://${mongoDBUsername}:${mongoDBPassword}@cluster0.hxdji7a.mongodb.net/${mongoAppName}?retryWrites=true&w=majority`;
-
-const mongoose = require("mongoose");
+//Building connection string for mongodb
+const mongoose = require("mongoose"); //requiring and connecting to mongodb
 mongoose.connect(connectionString);
 
 app.use(
+  //Starting a session to keep user signed in and store user data to use throughout the app
   sessions({
     secret: "my secret phrase",
     cookie: { maxAge: oneHour },
@@ -41,6 +44,7 @@ app.use(
 );
 
 app.use((request, response, next) => {
+  //storing the user data to use throughout the app
   response.locals.username = request.session.username || null;
   response.locals.firstname = request.session.firstname || null;
   response.locals.lastname = request.session.lastname || null;
@@ -49,11 +53,13 @@ app.use((request, response, next) => {
 });
 
 function checkLoggedIn(request, response, nextAction) {
+  //Checking if user is logged in
   if (request.session) {
+    //Checking if session has started and username has been given
     if (request.session.username) {
       nextAction();
     } else {
-      request.session.destroy();
+      request.session.destroy(); //Stopping session of there isn't a session or username
       response.render("pages/notloggedin", {
         isLoggedIn: getLoggedInState(request),
       });
@@ -62,9 +68,11 @@ function checkLoggedIn(request, response, nextAction) {
 }
 
 function getLoggedInState(request) {
+  //Checking if user is logged in
   return request.session && request.session.username;
 }
 function getAdminState(request) {
+  //Checking if user is an admin
   return request.session.admin;
 }
 
@@ -74,10 +82,12 @@ app.get("/", (request, response) => {
 });
 
 app.get("/home", (request, response) => {
+  //Serving home file when required
   response.sendFile(path.join(__dirname, "/public", "index.html"));
 });
 
 app.get("/app", checkLoggedIn, async (request, response) => {
+  //Serving app page with variables attached
   // response.sendFile(path.join(__dirname, "/views", "app.html"));
   response.render("pages/app", {
     isLoggedIn: getLoggedInState(request),
@@ -87,12 +97,14 @@ app.get("/app", checkLoggedIn, async (request, response) => {
 });
 
 app.get("/register", (request, response) => {
+  //Serving register page
   response.render("pages/register", {
     isLoggedIn: getLoggedInState(request),
   });
 });
 
 app.get("/profile", (request, response) => {
+  //Serving profile page with variables attached
   response.render("pages/profile", {
     isLoggedIn: getLoggedInState(request),
     firstname: response.locals.firstname,
@@ -101,6 +113,7 @@ app.get("/profile", (request, response) => {
 });
 
 app.get("/admin", async (request, response) => {
+  //Serving admin page
   response.render("pages/admin", {
     isLoggedIn: getLoggedInState(request),
     users: await userModel.getUser(),
@@ -108,6 +121,7 @@ app.get("/admin", async (request, response) => {
 });
 
 app.get("/login", (request, response) => {
+  //Serving login page
   // response.sendFile(path.join(__dirname, "/views", "login.html"));
   response.render("pages/login", {
     isLoggedIn: getLoggedInState(request),
@@ -115,6 +129,7 @@ app.get("/login", (request, response) => {
 });
 
 app.get("/logout", (request, response) => {
+  //Serving logout page
   request.session.destroy();
   response.render("pages/logout", {
     isLoggedIn: getLoggedInState(request),
@@ -122,10 +137,12 @@ app.get("/logout", (request, response) => {
 });
 
 app.get("/getposts", async (request, response) => {
+  //Getting the 8 most recent posts from mongodb
   response.json({ posts: await posts.getLatestNPost(8) });
 });
 
 app.post("/newpost", checkLoggedIn, async (request, response) => {
+  //Adding a new post
   await posts.addPost(request.body.message, request.session.username);
   const latestPosts = await posts.getLatestNPost(8);
 
@@ -135,12 +152,14 @@ app.post("/newpost", checkLoggedIn, async (request, response) => {
 });
 
 app.post("/register", async (request, response) => {
+  //Registering user with data gotten from the forms
   await userModel.registerUser(
     request.body.username,
     request.body.password,
     request.body.firstname,
     request.body.lastname
   );
+  //Setting session data to use throughout the app
   request.session.username = request.body.username;
   request.session.firstname = request.body.firstname;
   request.session.lastname = request.body.lastname;
@@ -149,6 +168,7 @@ app.post("/register", async (request, response) => {
 });
 
 app.post("/updateDetails", async (request, response) => {
+  //Updating user details
   await userModel.updateDetails(
     request.body.username,
     request.body.password,
@@ -156,6 +176,7 @@ app.post("/updateDetails", async (request, response) => {
     request.body.lastname,
     request.session.username
   );
+  //Setting session data to use throughout the app
   request.session.username = request.body.username;
   request.session.firstname = request.body.firstname;
   request.session.lastname = request.body.lastname;
@@ -164,11 +185,13 @@ app.post("/updateDetails", async (request, response) => {
 });
 
 app.post("/deletePost/:id", async (request, response) => {
+  //Allowing admin to delete posts
   await posts.deletePost(request.params.id);
   response.redirect("/app");
 });
 
 app.post("/deleteUser/:id", async (request, response) => {
+  //Allowing admin to delete users (and all their posts)
   const user = await userModel.findUserById(request.params.id);
 
   await userModel.deleteUser(request.params.id);
@@ -178,6 +201,7 @@ app.post("/deleteUser/:id", async (request, response) => {
 });
 
 app.post("/login", async (request, response) => {
+  //Login functionality
   const user = await userModel.checkUser(
     request.body.username,
     request.body.password
@@ -185,6 +209,7 @@ app.post("/login", async (request, response) => {
 
   // response.sendFile(path.join(__dirname, "/views", "app.html"));
   if (user) {
+    //Setting session data to use throughout the app
     request.session.username = user.username;
     request.session.admin = user.admin;
     request.session.firstname = user.firstname;
@@ -198,4 +223,4 @@ app.post("/login", async (request, response) => {
 });
 
 const PORT = 3000;
-app.listen(PORT, () => console.log(`Server running on port localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port localhost:${PORT}`)); //Starting website
