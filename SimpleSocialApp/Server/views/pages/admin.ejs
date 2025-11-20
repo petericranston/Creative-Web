@@ -1,0 +1,22 @@
+<%- include('../partials/header') %>
+<head>
+    <link rel="stylesheet" href="/styles/mainStyles.css">
+</head>
+<body>
+
+    <%- include('../partials/nav') %>
+
+    <h3>Users</h3>
+  <ul id="all-users">
+    <% users.forEach(post => { %>
+    <li>
+      <p><%= post.username %></p>
+
+      <form action="/deleteUser/<%= post._id %>" method="POST">
+        <button type="submit">Delete User</button>
+      </form>
+
+    </li>
+    <% }) %>
+</body>
+<%- include('../partials/footer') %>

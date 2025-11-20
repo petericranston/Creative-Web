@@ -1,12 +1,18 @@
 <nav>
   <a href="home">Home</a>
-  <% if(isLoggedIn) { %>
+
+  <% if (isLoggedIn) { %>
   <a href="profile">Profile</a>
   <a href="app">App</a>
-  <a href="logout">logout</a>
-  <% }else {%>
+
+  <% if (admin) { %>
+  <a href="admin">Admin</a>
+  <% } %>
+
+  <a href="logout">Logout</a>
+
+  <% } else { %>
   <a href="login">Login</a>
   <a href="register">Register</a>
-
-  <% }%>
+  <% } %>
 </nav>

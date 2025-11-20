@@ -13,6 +13,7 @@ const { resolveInclude } = require("ejs");
 const mongoose = require("mongoose");
 
 const { Schema, model } = mongoose;
+const { ObjectId } = require("mongoose").Types;
 
 const userSchema = new Schema({
   username: String,
@@ -21,6 +22,12 @@ const userSchema = new Schema({
 });
 
 const userData = model("users", userSchema);
+
+function getUser() {
+  let foundData = [];
+  foundData = userData.find({});
+  return foundData;
+}
 
 async function registerUser(username, password) {
   try {
@@ -47,6 +54,11 @@ async function checkUser(username, password) {
   return user;
 }
 
+async function deleteUser(id) {
+  console.log(id);
+  await userData.findByIdAndDelete(new ObjectId(id));
+}
+
 async function updateDetails(username, password, currentUsername) {
   try {
     const updating = await userData.updateOne(
@@ -68,4 +80,6 @@ module.exports = {
   registerUser,
   checkUser,
   updateDetails,
+  deleteUser,
+  getUser,
 };

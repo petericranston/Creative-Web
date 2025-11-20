@@ -96,6 +96,13 @@ app.get("/profile", (request, response) => {
   });
 });
 
+app.get("/admin", async (request, response) => {
+  response.render("pages/admin", {
+    isLoggedIn: getLoggedInState(request),
+    users: await userModel.getUser(),
+  });
+});
+
 app.get("/login", (request, response) => {
   // response.sendFile(path.join(__dirname, "/views", "login.html"));
   response.render("pages/login", {
@@ -144,6 +151,11 @@ app.post("/updateDetails", async (request, response) => {
 app.post("/deletePost/:id", async (request, response) => {
   await posts.deletePost(request.params.id);
   response.redirect("/app");
+});
+
+app.post("/deleteUser/:id", async (request, response) => {
+  await userModel.deleteUser(request.params.id);
+  response.redirect("/admin");
 });
 
 app.post("/login", async (request, response) => {
