@@ -56,9 +56,15 @@ async function deletePost(id) {
   await postData.findByIdAndDelete(new ObjectId(id));
 }
 
+async function deletePostsWithAccount(username) {
+  console.log(username);
+  const result = await postData.deleteMany({ user: username });
+}
+
 module.exports = {
   addPost,
   getPosts,
   getLatestNPost,
   deletePost,
+  deletePostsWithAccount,
 };

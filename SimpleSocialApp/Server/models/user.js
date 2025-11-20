@@ -29,6 +29,10 @@ function getUser() {
   return foundData;
 }
 
+function findUserById(id) {
+  const foundUser = userData.findById(id);
+  return foundUser;
+}
 async function registerUser(username, password) {
   try {
     const existing = await userData.findOne({ username: username });
@@ -82,4 +86,5 @@ module.exports = {
   updateDetails,
   deleteUser,
   getUser,
+  findUserById,
 };

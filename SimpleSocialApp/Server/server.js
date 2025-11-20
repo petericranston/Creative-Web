@@ -154,7 +154,11 @@ app.post("/deletePost/:id", async (request, response) => {
 });
 
 app.post("/deleteUser/:id", async (request, response) => {
+  const user = await userModel.findUserById(request.params.id);
+
   await userModel.deleteUser(request.params.id);
+  await posts.deletePostsWithAccount(user.username); // remove users posts
+
   response.redirect("/admin");
 });
 
