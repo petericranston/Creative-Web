@@ -18,6 +18,8 @@ const { ObjectId } = require("mongoose").Types;
 const userSchema = new Schema({
   username: String,
   password: String,
+  firstname: String,
+  lastname: String,
   admin: Boolean,
 });
 
@@ -33,7 +35,7 @@ function findUserById(id) {
   const foundUser = userData.findById(id);
   return foundUser;
 }
-async function registerUser(username, password) {
+async function registerUser(username, password, firstname, lastname) {
   try {
     const existing = await userData.findOne({ username: username });
     if (existing) {
@@ -43,6 +45,8 @@ async function registerUser(username, password) {
     await userData.create({
       username: username,
       password: password,
+      firstname: firstname,
+      lastname: lastname,
       admin: false,
     });
 
@@ -63,7 +67,13 @@ async function deleteUser(id) {
   await userData.findByIdAndDelete(new ObjectId(id));
 }
 
-async function updateDetails(username, password, currentUsername) {
+async function updateDetails(
+  username,
+  password,
+  firstname,
+  lastname,
+  currentUsername
+) {
   try {
     const updating = await userData.updateOne(
       { username: currentUsername },
@@ -71,6 +81,8 @@ async function updateDetails(username, password, currentUsername) {
         $set: {
           username: username,
           password: password,
+          firstname: firstname,
+          lastname: lastname,
         },
       }
     );

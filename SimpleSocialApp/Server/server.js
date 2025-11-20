@@ -42,6 +42,8 @@ app.use(
 
 app.use((request, response, next) => {
   response.locals.username = request.session.username || null;
+  response.locals.firstname = request.session.firstname || null;
+  response.locals.lastname = request.session.lastname || null;
   response.locals.admin = request.session.admin || null;
   next();
 });
@@ -93,6 +95,8 @@ app.get("/register", (request, response) => {
 app.get("/profile", (request, response) => {
   response.render("pages/profile", {
     isLoggedIn: getLoggedInState(request),
+    firstname: response.locals.firstname,
+    lastname: response.locals.lastname,
   });
 });
 
@@ -131,8 +135,15 @@ app.post("/newpost", checkLoggedIn, async (request, response) => {
 });
 
 app.post("/register", async (request, response) => {
-  await userModel.registerUser(request.body.username, request.body.password);
+  await userModel.registerUser(
+    request.body.username,
+    request.body.password,
+    request.body.firstname,
+    request.body.lastname
+  );
   request.session.username = request.body.username;
+  request.session.firstname = request.body.firstname;
+  request.session.lastname = request.body.lastname;
   // response.sendFile(path.join(__dirname, "/views", "app.html"));
   response.redirect("/app");
 });
@@ -141,9 +152,13 @@ app.post("/updateDetails", async (request, response) => {
   await userModel.updateDetails(
     request.body.username,
     request.body.password,
+    request.body.firstname,
+    request.body.lastname,
     request.session.username
   );
   request.session.username = request.body.username;
+  request.session.firstname = request.body.firstname;
+  request.session.lastname = request.body.lastname;
   // response.sendFile(path.join(__dirname, "/views", "app.html"));
   response.redirect("/profile");
 });
@@ -167,10 +182,13 @@ app.post("/login", async (request, response) => {
     request.body.username,
     request.body.password
   );
+
   // response.sendFile(path.join(__dirname, "/views", "app.html"));
   if (user) {
     request.session.username = user.username;
     request.session.admin = user.admin;
+    request.session.firstname = user.firstname;
+    request.session.lastname = user.lastname;
     response.redirect("/app");
   } else {
     response.render("pages/login_failed", {

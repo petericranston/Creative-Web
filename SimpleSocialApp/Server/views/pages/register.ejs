@@ -6,12 +6,15 @@
 <body>
   <h2>Register</h2>
   <%- include('../partials/nav') %>
-
   <form action="/register" method="POST">
     <label>Username</label>
     <input type="text" id="username" name="username" />
     <label>Password</label>
     <input type="text" id="password" name="password" />
+    <label>Firstname</label>
+    <input type="text" id="firstname" name="firstname" />
+    <label>lastname</label>
+    <input type="text" id="lastname" name="lastname" />
     <input type="submit" value="Register" />
   </form>
 </body>

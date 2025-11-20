@@ -3,15 +3,21 @@
 </head>
 <body>
   <h1>Simple Social App</h1>
-  <h2><%= username %></h2>
+  <h2><%= firstname %></h2>
+  <h2><%= lastname %></h2>
   <%- include('../partials/nav') %>
 
   <h3>Update Details</h3>
   <form action="/updateDetails" method="POST">
-    <label>Update Details</label>
+    <label>Username</label>
     <input type="text" id="username" name="username" />
+    <label>Password</label>
     <input type="text" id="password" name="password" />
-    <input type="submit" value="updateDetails" />
+    <label>Firstname</label>
+    <input type="text" id="firstname" name="firstname" />
+    <label>lastname</label>
+    <input type="text" id="lastname" name="lastname" />
+    <input type="submit" value="Register" />
   </form>
 </body>
 <%- include('../partials/footer') %>
