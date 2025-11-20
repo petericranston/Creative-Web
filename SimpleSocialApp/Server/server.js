@@ -39,6 +39,11 @@ app.use(
   })
 );
 
+app.use((request, response, next) => {
+  response.locals.username = request.session.username || null;
+  next();
+});
+
 function checkLoggedIn(request, response, nextAction) {
   if (request.session) {
     if (request.session.username) {
