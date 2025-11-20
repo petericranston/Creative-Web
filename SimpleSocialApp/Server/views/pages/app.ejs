@@ -18,6 +18,11 @@
     <% posts.forEach(post => { %>
     <li>
       <p>Message: <%= post.message %> by: <%= post.user %></p>
+      <% if(admin) { %>
+      <form action="/deletePost/<%= post._id %>" method="POST">
+        <button type="submit">Delete Post</button>
+      </form>
+      <% }%>
     </li>
     <% }) %>
   </ul>

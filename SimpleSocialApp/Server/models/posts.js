@@ -13,6 +13,7 @@
 // ];
 
 const mongoose = require("mongoose");
+const { ObjectId } = require("mongoose").Types;
 
 const { Schema, model } = mongoose;
 
@@ -50,8 +51,14 @@ function addPost(message, user) {
   });
 }
 
+async function deletePost(id) {
+  console.log(id);
+  await postData.findByIdAndDelete(new ObjectId(id));
+}
+
 module.exports = {
   addPost,
   getPosts,
   getLatestNPost,
+  deletePost,
 };

@@ -34,7 +34,7 @@ mongoose.connect(connectionString);
 app.use(
   sessions({
     secret: "my secret phrase",
-    cookie: { maxAge: threeMinutes },
+    cookie: { maxAge: oneHour },
     resave: false,
     saveUninitialized: false,
   })
@@ -62,6 +62,9 @@ function checkLoggedIn(request, response, nextAction) {
 function getLoggedInState(request) {
   return request.session && request.session.username;
 }
+function getAdminState(request) {
+  return request.session.admin;
+}
 
 // Index file served first
 app.get("/", (request, response) => {
@@ -77,6 +80,7 @@ app.get("/app", checkLoggedIn, async (request, response) => {
   response.render("pages/app", {
     isLoggedIn: getLoggedInState(request),
     posts: await posts.getLatestNPost(8),
+    admin: getAdminState(request),
   });
 });
 
@@ -137,10 +141,20 @@ app.post("/updateDetails", async (request, response) => {
   response.redirect("/profile");
 });
 
+app.post("/deletePost/:id", async (request, response) => {
+  await posts.deletePost(request.params.id);
+  response.redirect("/app");
+});
+
 app.post("/login", async (request, response) => {
-  if (await userModel.checkUser(request.body.username, request.body.password)) {
-    request.session.username = request.body.username;
-    // response.sendFile(path.join(__dirname, "/views", "app.html"));
+  const user = await userModel.checkUser(
+    request.body.username,
+    request.body.password
+  );
+  // response.sendFile(path.join(__dirname, "/views", "app.html"));
+  if (user) {
+    request.session.username = user.username;
+    request.session.admin = user.admin;
     response.redirect("/app");
   } else {
     response.render("pages/login_failed", {

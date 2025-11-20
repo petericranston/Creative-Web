@@ -43,11 +43,8 @@ async function registerUser(username, password) {
 }
 
 async function checkUser(username, password) {
-  const existing = await userData.findOne({ username: username });
-  if (!existing) {
-    return false;
-  }
-  return existing.password === password;
+  const user = await userData.findOne({ username: username });
+  return user;
 }
 
 async function updateDetails(username, password, currentUsername) {
