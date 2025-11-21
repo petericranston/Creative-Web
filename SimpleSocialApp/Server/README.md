@@ -1,3 +1,5 @@
 # Simple Social App
 
-One of the key techniques
+The majority of this apps point was to implement a functional backend server, and to connect it to mongodb, so i can store user data and posts data after the server stops running. I did this using mongodb and compass as the gui to view the data stored. This was an interesting project to take on. On top of classwork, i watched all the recordings of the classwork to remind myself and learn how it all works.
+I used EJS as a template for my frontend, this helped my embed js into my front end easily and without hassle. For example, I used it to send the data from mongodb (username, firstname and lastname) into pages where it was necessary. After learning how EJS worked, it was much more simple than using document.id and innertext in a seperate js file, so that was helpful to learn and use. I will be using React for my frontend in my main project however, which will have similar functionality but with loads of extra functionality on top of it.
+Overall, it was a good learning experience, and has left me more confident to get started on my real project.
