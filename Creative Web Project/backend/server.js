@@ -33,6 +33,13 @@ app.use(
   })
 );
 
+app.use((request, response, next) => {
+  //storing the user data to use throughout the app
+  response.locals.username = request.session.username || null;
+  response.locals.admin = request.session.admin || null;
+  next();
+});
+
 app.get("/api", (req, res) => {
   res.json({ users: ["one", "two", "three"] });
 });
