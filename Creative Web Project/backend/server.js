@@ -17,7 +17,6 @@ const mongoAppName = process.env.mongoAppName;
 
 const connectionString = `mongodb+srv://${mongoDBUsername}:${mongoDBPassword}@cluster0.hxdji7a.mongodb.net/${mongoAppName}?retryWrites=true&w=majority`;
 //Building connection string for mongodb
-const mongoose = require("mongoose"); //requiring and connecting to mongodb
 mongoose.connect(connectionString);
 
 const threeMinutes = 3 * 60 * 1000; //Variables to decide how long the user will be singed in for
