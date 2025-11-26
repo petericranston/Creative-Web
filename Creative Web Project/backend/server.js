@@ -43,7 +43,7 @@ app.use((request, response, next) => {
 });
 
 app.post("/api/register", async (request, response) => {
-  //Registering user with data gotten from the forms
+  //Registering user with data gotten from the forms\
   await userModel.registerUser(request.body.username, request.body.password);
   //Setting session data to use throughout the app
   request.session.username = request.body.username;
