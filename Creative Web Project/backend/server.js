@@ -3,6 +3,9 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv").config(); //Configuring my .env for secret keys (mongodb)
 
+//Requiring models
+const userModel = require("./models/users");
+
 const app = express();
 
 app.use(cors());
@@ -39,8 +42,13 @@ app.use((request, response, next) => {
   next();
 });
 
-app.get("/api", (req, res) => {
-  res.json({ users: ["one", "two", "three"] });
+app.post("/api/register", async (request, response) => {
+  //Registering user with data gotten from the forms
+  await userModel.registerUser(request.body.username, request.body.password);
+  //Setting session data to use throughout the app
+  request.session.username = request.body.username;
+  // response.sendFile(path.join(__dirname, "/views", "app.html"));
+  response.redirect("/home");
 });
 
 app.listen(3000, () => {
