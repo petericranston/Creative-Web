@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ username: "", password: "" });
 
   function handleUsername(e) {
@@ -20,6 +22,7 @@ export default function Register() {
     const data = await response.json();
 
     setFormData({ username: "", password: "" });
+    navigate("/");
   }
 
   return (
