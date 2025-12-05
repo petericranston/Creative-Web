@@ -26,6 +26,10 @@ const threeMinutes = 3 * 60 * 1000; //Variables to decide how long the user will
 const oneHour = 1 * 60 * 60 * 1000;
 
 app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
   //Starting a session to keep user signed in and store user data to use throughout the app
   sessions({
     secret: "No Secret Yet",
@@ -49,6 +53,18 @@ app.post("/api/register", async (request, response) => {
   request.session.username = request.body.username;
   // response.sendFile(path.join(__dirname, "/views", "app.html"));
   response.json({ success: true });
+});
+
+app.get("/api/user", (request, response) => {
+  if (!request.session.username) {
+    //Checking if user is logged in
+    return response.json({ loggedIn: false });
+  }
+  response.json({
+    //Sending data if the user is logged in
+    loggedIn: true,
+    username: request.session.username,
+  });
 });
 
 app.listen(3000, () => {
