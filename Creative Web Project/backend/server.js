@@ -48,7 +48,7 @@ app.post("/api/register", async (request, response) => {
   //Setting session data to use throughout the app
   request.session.username = request.body.username;
   // response.sendFile(path.join(__dirname, "/views", "app.html"));
-  response.redirect("/home");
+  response.json({ success: true });
 });
 
 app.listen(3000, () => {
