@@ -16,7 +16,7 @@ export default function Home() {
   return (
     <div>
       <h1>Home Page</h1>
-      <p>Welcome, {user}</p>
+      {user ? <p>Welcome, {user}</p> : <p>Your not logged in</p>}
     </div>
   );
 }

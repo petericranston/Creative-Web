@@ -55,6 +55,24 @@ app.post("/api/register", async (request, response) => {
   response.json({ success: true });
 });
 
+app.post("/api/login", async (request, response) => {
+  //Login functionality
+  const user = await userModel.checkUser(
+    request.body.username,
+    request.body.password
+  );
+
+  // response.sendFile(path.join(__dirname, "/views", "app.html"));
+  if (user) {
+    //Setting session data to use throughout the app
+    request.session.username = user.username;
+    request.session.admin = user.admin;
+    response.json({ success: true });
+  } else {
+    console.log("Login Failed");
+  }
+});
+
 app.get("/api/user", (request, response) => {
   if (!request.session.username) {
     //Checking if user is logged in

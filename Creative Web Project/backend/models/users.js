@@ -35,6 +35,16 @@ async function registerUser(username, password) {
   }
 }
 
+async function checkUser(username, password) {
+  //Finding user
+  const user = await userData.findOne({
+    username: username,
+    password: password,
+  });
+  return user;
+}
+
 module.exports = {
   registerUser,
+  checkUser,
 };
