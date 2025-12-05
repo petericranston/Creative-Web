@@ -14,17 +14,26 @@ export default function Register() {
 
   async function submit(e) {
     e.preventDefault();
-    const response = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    const data = await response.json();
 
-    setFormData({ username: "", password: "" });
-    navigate("/");
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (!response.ok) {
+        console.log("Registration Failed");
+        return;
+      }
+
+      const data = await response.json();
+      setFormData({ username: "", password: "" });
+      navigate("/");
+      console.log("User Registered");
+    } catch (error) {
+      console.log("Registration Failed: ", error);
+    }
   }
-
   return (
     <div>
       <h1>Register</h1>
