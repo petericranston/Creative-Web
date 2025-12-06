@@ -79,7 +79,6 @@ app.post("/api/logout", async (request, response) => {
   } else {
     request.session.destroy();
     response.clearCookie("connect.sid");
-    response.render("/");
   }
 });
 
