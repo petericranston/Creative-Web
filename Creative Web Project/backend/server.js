@@ -73,6 +73,16 @@ app.post("/api/login", async (request, response) => {
   }
 });
 
+app.post("/api/logout", async (request, response) => {
+  if (!request.session.username) {
+    return response.json({ loggedIn: false });
+  } else {
+    request.session.destroy();
+    response.clearCookie("connect.sid");
+    response.render("/");
+  }
+});
+
 app.get("/api/user", (request, response) => {
   if (!request.session.username) {
     //Checking if user is logged in
