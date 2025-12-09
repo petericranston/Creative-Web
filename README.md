@@ -18,5 +18,5 @@ I believe that the biggest obstacle that i am going to face will definitely surr
 
 I have looked into various apis, as stated before, and i am going to continue, while also looking at the possibility of creating it myself in the future.
 
-From my independent study, i have looked into some web apps that have similar functionality that i am planning on developing, they essentially have helped me figure out the feasibility of the project, which i think is feasible with a lot of time put into the main functionality.
+From my independent study, on top of developing the app, i have looked into some web apps that have similar functionality that i am planning on developing, they essentially have helped me figure out the feasibility of the project, which i think is feasible with a lot of time put into the main functionality.
 I have began work on the project, most of the early work has been connecting up the backend and frontend (as well as mongodb), and getting user accounts up and running, to create the infrastructure required to have users interact with one another.
