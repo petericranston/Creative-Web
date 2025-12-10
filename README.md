@@ -12,9 +12,9 @@ I will have to use an API for the creation of the maps, so that the project is i
 
 There are two sides to the audience of this web app, the first of which is the creators of the worlds. This could be anyone, authors, DnD players, or someone just wanting to create a world that interests them. The other side of the audience is the users that would look and use these interactive maps. Age, gender and race demographics are less important for this project. Users will more than likely be over the age of 16 but other than that it won't be tailored to a demographic.
 
-My planned technology stack to implement this idea is going to be predominantly react for the front end, and node.js for the backend. These libraries (along with various dependencies) should be sufficient to create the idea that i have developed. The map library has yet to be determined, or whether I will create the codebase for this functionality myself.
+My planned technology stack to implement this idea is going to be predominantly react for the front end, and node.js for the backend. These libraries (along with various dependencies) should be sufficient to create the idea that i have developed. The map library has yet to be determined, or whether I will create the codebase for this functionality myself (however leaflet.js is looking most likely).
 
-I believe that the biggest obstacle that i am going to face will definitely surround the creation of the map functionality, and making it as smooth of an experience as possible for the user. I'm not exactly sure how i am going to create this functionality so i'll have to do a lot of research as to the ways that i could build it.
+I believe that the biggest obstacle that i am going to face will definitely surround the creation of the map functionality, and making it as smooth of an experience as possible for the user. I've decided that the most likely to be feasible option for me is to use is the api leaflet.js (react leaflet), because it will allow me to make customizable maps that the users can add their own content on top.
 
 I have looked into various apis, as stated before, and i am going to continue, while also looking at the possibility of creating it myself in the future.
 
