@@ -5,14 +5,18 @@ export default function Navbar() {
   const navigate = useNavigate();
   const logout = async () => {
     //Logout function
-    await fetch("/api/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-    if (window.location.pathname === "/") {
-      window.location.reload(); //Reloading page if the user is already on the home page
-    } else {
-      navigate("/"); //Sending user to home page if they aren't already on it
+    try {
+      const response = await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (window.location.pathname === "/") {
+        window.location.reload(); //Reloading page if the user is already on the home page
+      } else {
+        navigate("/"); //Sending user to home page if they aren't already on it
+      }
+    } catch (error) {
+      console.log("Error logging out");
     }
   };
   return (
