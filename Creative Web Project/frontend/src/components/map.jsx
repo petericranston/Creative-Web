@@ -9,8 +9,8 @@ import {
 import L from "leaflet";
 
 export default function Map() {
-  const width = 1000;
-  const height = 500;
+  const width = 800;
+  const height = 1000;
   const bounds = [
     [0, 0],
     [height, width],
