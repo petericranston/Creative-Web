@@ -19,7 +19,8 @@ export default function Navbar() {
     //Nav buttons
     <nav>
       <Link to="/">Home</Link> | <Link to="/login">Login</Link> |{" "}
-      <Link to="/register">Register</Link> |{" "}
+      <Link to="/register">Register</Link> | <Link to="/create">Create</Link> |{" "}
+      <Link to="/viewOthers">View Others Maps</Link> |{" "}
       <button onClick={logout}>Logout</button>
     </nav>
   );
