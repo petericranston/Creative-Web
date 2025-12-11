@@ -46,6 +46,7 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
   border-color: #646cff;
 }
@@ -72,6 +73,7 @@ main {
 }
 
 header {
+  padding-top: 20px;
   position: fixed;
   top: 0;
   left: 0;
@@ -82,7 +84,7 @@ header {
 
 nav {
   position: fixed;
-  top: 55px;
+  top: 75px;
   left: 0;
   width: 100%;
   z-index: 999;
