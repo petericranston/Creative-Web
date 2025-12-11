@@ -10,6 +10,9 @@ export default function Create() {
         <button className="create-buttons">New Map</button>
         <button className="create-buttons">My Maps</button>
         <div id="map-edits">
+          <button className="create-buttons" id="add-marker">
+            Add Marker
+          </button>
           <Map />
         </div>
       </main>
