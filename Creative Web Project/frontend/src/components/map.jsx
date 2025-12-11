@@ -7,6 +7,7 @@ import {
   useMapEvent,
 } from "react-leaflet";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 export default function Map() {
   const width = 800;

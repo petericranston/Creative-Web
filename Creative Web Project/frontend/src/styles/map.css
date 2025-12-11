@@ -5,5 +5,12 @@
 }
 
 #root {
+  height: 50vh;
+  width: 100vh;
+  text-align: center;
+}
+
+.leaflet-container {
   height: 100vh;
+  width: 100vh;
 }
