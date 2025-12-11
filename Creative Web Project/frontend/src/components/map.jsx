@@ -6,7 +6,7 @@ import {
   Popup,
   useMapEvent,
 } from "react-leaflet";
-import L from "leaflet";
+import L, { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 export default function Map() {
@@ -17,6 +17,22 @@ export default function Map() {
     [height, width],
   ];
 
+  const markers = [
+    {
+      geocode: [330, 650],
+      popUp: "Kings Landing",
+    },
+    {
+      geocode: [200, 200],
+      popUp: "Dorne",
+    },
+  ];
+
+  const customIcon = new Icon({
+    iconUrl: "./images/marker.png",
+    iconSize: [38, 38],
+  });
+
   return (
     <MapContainer
       crs={L.CRS.Simple}
@@ -25,6 +41,9 @@ export default function Map() {
       id="map-container"
     >
       <ImageOverlay url="/images/BlankMap.png" bounds={bounds} />
+      {markers.map((marker) => (
+        <Marker position={marker.geocode} icon={customIcon}></Marker>
+      ))}
     </MapContainer>
   );
 }
