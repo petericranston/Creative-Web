@@ -16,8 +16,10 @@ export default function Home() {
 
   return (
     <div>
-      <h1>Home Page</h1>
-      {user ? <p>Welcome, {user}</p> : <p>Your not logged in</p>}
+      <header>
+        <h1>Home Page</h1>
+      </header>
+      <main>{user ? <p>Welcome, {user}</p> : <p>Your not logged in</p>}</main>
     </div>
   );
 }

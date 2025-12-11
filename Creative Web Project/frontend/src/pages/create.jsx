@@ -2,8 +2,12 @@ import Map from "../components/map";
 export default function Create() {
   return (
     <div>
-      <h1>Create a map</h1>
-      <Map />
+      <header>
+        <h1>Create a map</h1>
+      </header>
+      <main>
+        <Map />
+      </main>
     </div>
   );
 }

@@ -36,24 +36,28 @@ export default function Login() {
   }
   return (
     <div>
-      <h1>Login</h1>
-      <form onSubmit={submit}>
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleUsername}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handlePassword}
-        />
-        <button type="submit">Login</button>
-      </form>
+      <header>
+        <h1>Login</h1>
+      </header>
+      <main>
+        <form onSubmit={submit}>
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={formData.username}
+            onChange={handleUsername}
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handlePassword}
+          />
+          <button type="submit">Login</button>
+        </form>
+      </main>
     </div>
   );
 }
