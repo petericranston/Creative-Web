@@ -10,8 +10,8 @@ import L, { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 export default function Map() {
-  const width = 800;
-  const height = 1000;
+  const width = 950;
+  const height = 1150;
   const bounds = [
     [0, 0],
     [height, width],
@@ -19,15 +19,15 @@ export default function Map() {
 
   const markers = [
     {
-      geocode: [320, 670],
+      geocode: [370, 780],
       popUp: "Kings Landing",
     },
     {
-      geocode: [620, 430],
+      geocode: [730, 520],
       popUp: "Winterfell",
     },
     {
-      geocode: [300, 300],
+      geocode: [330, 350],
       popUp: "High Garden",
     },
   ];
