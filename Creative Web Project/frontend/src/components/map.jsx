@@ -19,15 +19,15 @@ export default function Map() {
 
   const markers = [
     {
-      geocode: [370, 780],
+      coords: [370, 780],
       popUp: "Kings Landing",
     },
     {
-      geocode: [730, 520],
+      coords: [730, 520],
       popUp: "Winterfell",
     },
     {
-      geocode: [330, 350],
+      coords: [330, 350],
       popUp: "High Garden",
     },
   ];
@@ -38,10 +38,16 @@ export default function Map() {
   });
 
   return (
-    <MapContainer crs={L.CRS.Simple} bounds={bounds} id="map-container">
+    <MapContainer
+      crs={L.CRS.Simple}
+      bounds={bounds}
+      maxBounds={bounds}
+      maxBoundsViscosity={1.0}
+      id="map-container"
+    >
       <ImageOverlay url="/images/BlankMap.png" bounds={bounds} />
       {markers.map((marker) => (
-        <Marker position={marker.geocode} icon={customIcon}>
+        <Marker position={marker.coords} icon={customIcon}>
           <Popup>{marker.popUp}</Popup>
         </Marker>
       ))}
