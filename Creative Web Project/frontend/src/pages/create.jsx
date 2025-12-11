@@ -1,4 +1,5 @@
 import Map from "../components/map";
+import "../styles/create.css";
 export default function Create() {
   return (
     <div>
@@ -6,6 +7,7 @@ export default function Create() {
         <h1>Create a map</h1>
       </header>
       <main>
+        <button id="create-new-map">New Map</button>
         <Map />
       </main>
     </div>

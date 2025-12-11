@@ -77,12 +77,14 @@ header {
   left: 0;
   width: 100%;
   z-index: 1000;
+  background-color: #242424;
 }
 
 nav {
   position: fixed;
-  top: 60px;
+  top: 55px;
   left: 0;
   width: 100%;
   z-index: 999;
+  background-color: #242424;
 }

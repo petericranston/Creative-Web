@@ -22,6 +22,7 @@ export default function Map() {
       crs={L.CRS.Simple}
       style={{ height: "100vh", width: "100%" }}
       bounds={bounds}
+      id="map-container"
     >
       <ImageOverlay url="/images/BlankMap.png" bounds={bounds} />
     </MapContainer>
