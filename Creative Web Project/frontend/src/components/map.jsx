@@ -19,12 +19,12 @@ export default function Map() {
 
   const markers = [
     {
-      geocode: [330, 650],
+      geocode: [320, 670],
       popUp: "Kings Landing",
     },
     {
-      geocode: [200, 200],
-      popUp: "Dorne",
+      geocode: [620, 430],
+      popUp: "Winterfell",
     },
   ];
 
@@ -42,7 +42,9 @@ export default function Map() {
     >
       <ImageOverlay url="/images/BlankMap.png" bounds={bounds} />
       {markers.map((marker) => (
-        <Marker position={marker.geocode} icon={customIcon}></Marker>
+        <Marker position={marker.geocode} icon={customIcon}>
+          <Popup>{marker.popUp}</Popup>
+        </Marker>
       ))}
     </MapContainer>
   );
