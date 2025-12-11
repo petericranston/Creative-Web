@@ -7,8 +7,11 @@ export default function Create() {
         <h1>Create a map</h1>
       </header>
       <main>
-        <button id="create-new-map">New Map</button>
-        <Map />
+        <button className="create-buttons">New Map</button>
+        <button className="create-buttons">My Maps</button>
+        <div id="map-edits">
+          <Map />
+        </div>
       </main>
     </div>
   );

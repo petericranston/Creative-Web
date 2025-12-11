@@ -78,7 +78,7 @@ header {
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1000;
+  z-index: 1500;
   background-color: #242424;
 }
 
@@ -87,6 +87,6 @@ nav {
   top: 75px;
   left: 0;
   width: 100%;
-  z-index: 999;
+  z-index: 1500;
   background-color: #242424;
 }
