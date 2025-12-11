@@ -26,6 +26,10 @@ export default function Map() {
       geocode: [620, 430],
       popUp: "Winterfell",
     },
+    {
+      geocode: [300, 300],
+      popUp: "High Garden",
+    },
   ];
 
   const customIcon = new Icon({
