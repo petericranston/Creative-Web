@@ -21,20 +21,23 @@ export default function Create() {
       popUp: "Harrenhall",
     },
   ]);
+  const [mapID, setMapID] = useState(1);
 
   async function NewMarker() {
-    // try {
-    //   const response = await fetch("/api/addMarker", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //   });
-    //   if (!response.ok) {
-    //     console.log("Marker failed to add");
-    //     return;
-    //   }
-    // } catch (error) {
-    //   console.log("Marker failed to add ", error);
-    // }
+    try {
+      const response = await fetch("/api/addMarker", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mapID }),
+      });
+      if (!response.ok) {
+        console.log("Marker failed to add.");
+        return;
+      }
+    } catch (error) {
+      console.log("Marker failed to add ", error);
+    }
     const newMarker = { coords: [600, 600], popUp: "newMarker" };
 
     setMarkers((prevMarkers) => [...prevMarkers, newMarker]);

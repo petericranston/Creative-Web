@@ -94,6 +94,14 @@ app.get("/api/user", (request, response) => {
   });
 });
 
+app.post("/api/addMarker", async (request, response) => {
+  //Login functionality
+  const mapID = request.body.mapID;
+  console.log(mapID);
+
+  response.json({ success: true });
+});
+
 app.listen(3000, () => {
   console.log("Server running on port http://localhost:3000/");
 });
