@@ -1,6 +1,41 @@
+import { marker } from "leaflet";
 import Map from "../components/map";
 import "../styles/create.css";
 export default function Create() {
+  async function NewMarker() {
+    try {
+      const response = await fetch("/api/addMarker", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) {
+        console.log("Marker failed to add");
+        return;
+      }
+    } catch (error) {
+      console.log("Marker failed to add ", error);
+    }
+  }
+
+  const markers = [
+    {
+      coords: [370, 780],
+      popUp: "Kings Landing",
+    },
+    {
+      coords: [730, 520],
+      popUp: "Winterfell",
+    },
+    {
+      coords: [330, 350],
+      popUp: "High Garden",
+    },
+    {
+      coords: [450, 600],
+      popUp: "Harrenhall",
+    },
+  ];
+
   return (
     <div>
       <header>
@@ -10,10 +45,14 @@ export default function Create() {
         <button className="create-buttons">New Map</button>
         <button className="create-buttons">My Maps</button>
         <div id="map-edits">
-          <button className="create-buttons" id="add-marker">
+          <button
+            className="create-buttons"
+            id="add-marker"
+            onClick={NewMarker}
+          >
             Add Marker
           </button>
-          <Map />
+          <Map data={markers} />
         </div>
       </main>
     </div>

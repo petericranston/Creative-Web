@@ -9,27 +9,14 @@ import {
 import L, { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-export default function Map() {
+export default function Map(props) {
+  let markers = props.data;
+
   const width = 950;
   const height = 1150;
   const bounds = [
     [0, 0],
     [height, width],
-  ];
-
-  const markers = [
-    {
-      coords: [370, 780],
-      popUp: "Kings Landing",
-    },
-    {
-      coords: [730, 520],
-      popUp: "Winterfell",
-    },
-    {
-      coords: [330, 350],
-      popUp: "High Garden",
-    },
   ];
 
   const customIcon = new Icon({
