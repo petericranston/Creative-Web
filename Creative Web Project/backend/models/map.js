@@ -4,8 +4,7 @@ const { Schema, model } = mongoose;
 const { ObjectId } = require("mongoose").Types;
 
 const markerSchema = new Schema({
-  xCord: Number,
-  yCord: Number,
+  coords: Array,
   popUp: String,
 });
 
@@ -15,11 +14,12 @@ const mapSchema = new Schema({
   markers: [markerSchema],
 });
 
+const mapData = model("map", mapSchema);
+
 async function newMap(mapID, markers) {
-  //Registering new user
   try {
-    await userData.create({
-      //Creating new user on mongodb
+    await mapData.create({
+      //Creating new map on mongodb
       mapID: mapID,
       markers: markers,
     });

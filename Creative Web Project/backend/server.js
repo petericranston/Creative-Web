@@ -101,6 +101,7 @@ app.post("/api/addMarker", async (request, response) => {
   const markers = request.body.markers;
   console.log(mapID);
   console.log(markers);
+  await mapModel.newMap(mapID, markers);
 
   response.json({ success: true });
 });

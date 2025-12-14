@@ -24,6 +24,10 @@ export default function Create() {
   const [mapID, setMapID] = useState(1);
 
   async function NewMarker() {
+    const newMarker = { coords: [600, 600], popUp: "newMarker" };
+
+    setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
+
     try {
       const response = await fetch("/api/addMarker", {
         method: "POST",
@@ -38,9 +42,6 @@ export default function Create() {
     } catch (error) {
       console.log("Marker failed to add ", error);
     }
-    const newMarker = { coords: [600, 600], popUp: "newMarker" };
-
-    setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
   }
 
   return (
