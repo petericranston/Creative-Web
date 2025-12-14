@@ -29,7 +29,7 @@ export default function Create() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mapID }),
+        body: JSON.stringify({ mapID, markers }),
       });
       if (!response.ok) {
         console.log("Marker failed to add.");

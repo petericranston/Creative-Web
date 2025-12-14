@@ -5,6 +5,7 @@ const dotenv = require("dotenv").config(); //Configuring my .env for secret keys
 
 //Requiring models
 const userModel = require("./models/users");
+const mapModel = require("./models/map");
 
 const app = express();
 
@@ -97,7 +98,9 @@ app.get("/api/user", (request, response) => {
 app.post("/api/addMarker", async (request, response) => {
   //Login functionality
   const mapID = request.body.mapID;
+  const markers = request.body.markers;
   console.log(mapID);
+  console.log(markers);
 
   response.json({ success: true });
 });
