@@ -21,6 +21,7 @@ export default function Create() {
       popUp: "Harrenhall",
     },
   ]);
+
   const [mapID, setMapID] = useState(1);
 
   async function NewMarker() {
@@ -44,13 +45,32 @@ export default function Create() {
     }
   }
 
+  async function newMap() {
+    try {
+      const response = await fetch("/api/newMap", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mapID }),
+      });
+      if (!response.ok) {
+        console.log("Failed to create map");
+        return;
+      }
+    } catch (error) {
+      console.log("Failed to create map", error);
+    }
+  }
+
   return (
     <div>
       <header>
         <h1>Create a map</h1>
       </header>
       <main>
-        <button className="create-buttons">New Map</button>
+        <button className="create-buttons" onClick={newMap}>
+          New Map
+        </button>
         <button className="create-buttons">My Maps</button>
         <div id="map-edits">
           <button
