@@ -2,6 +2,8 @@ import { marker, popup } from "leaflet";
 import { useState } from "react";
 import Map from "../components/map";
 import "../styles/create.css";
+import { useTransition } from "react";
+import { useSyncExternalStore } from "react";
 export default function Create() {
   const [markers, setMarkers] = useState([
     {
@@ -22,27 +24,29 @@ export default function Create() {
     },
   ]);
 
-  const [mapID, setMapID] = useState(1);
+  const [mapID, setMapID] = useState();
+  const [nameInputVisible, setNameInputVisible] = useState(false);
+  const [mapName, setMapName] = useState("");
 
   async function NewMarker() {
     const newMarker = { coords: [600, 600], popUp: "newMarker" };
 
     setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
 
-    try {
-      const response = await fetch("/api/addMarker", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mapID, markers }),
-      });
-      if (!response.ok) {
-        console.log("Marker failed to add.");
-        return;
-      }
-    } catch (error) {
-      console.log("Marker failed to add ", error);
-    }
+    // try {
+    //   const response = await fetch("/api/addMarker", {
+    //     method: "POST",
+    //     credentials: "include",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({ mapID, markers }),
+    //   });
+    //   if (!response.ok) {
+    //     console.log("Marker failed to add.");
+    //     return;
+    //   }
+    // } catch (error) {
+    //   console.log("Marker failed to add ", error);
+    // }
   }
 
   async function newMap() {
@@ -51,7 +55,7 @@ export default function Create() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mapID }),
+        body: JSON.stringify({ mapID, markers, mapName }),
       });
       if (!response.ok) {
         console.log("Failed to create map");
@@ -62,15 +66,36 @@ export default function Create() {
     }
   }
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      setNameInputVisible(false);
+      console.log(mapName);
+      newMap();
+    }
+  };
+
   return (
     <div>
       <header>
         <h1>Create a map</h1>
       </header>
       <main>
-        <button className="create-buttons" onClick={newMap}>
+        <button
+          className="create-buttons"
+          onClick={() => setNameInputVisible(true)}
+        >
           New Map
         </button>
+        {nameInputVisible && (
+          <input
+            type="text"
+            value={mapName}
+            onChange={(e) => setMapName(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Enter Map Name"
+          />
+        )}
         <button className="create-buttons">My Maps</button>
         <div id="map-edits">
           <button

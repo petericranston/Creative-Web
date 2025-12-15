@@ -95,13 +95,16 @@ app.get("/api/user", (request, response) => {
   });
 });
 
-app.post("/api/addMarker", async (request, response) => {
+app.post("/api/newMap", async (request, response) => {
   //Login functionality
   const mapID = request.body.mapID;
   const markers = request.body.markers;
+  const mapName = request.body.mapName;
+
   console.log(mapID);
   console.log(markers);
-  await mapModel.newMap(mapID, markers);
+  console.log(mapName);
+  await mapModel.newMap(mapID, markers, mapName);
 
   response.json({ success: true });
 });

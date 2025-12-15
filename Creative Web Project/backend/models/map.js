@@ -10,16 +10,18 @@ const markerSchema = new Schema({
 
 const mapSchema = new Schema({
   //Making database document layout
+  mapName: String,
   mapID: Number,
   markers: [markerSchema],
 });
 
 const mapData = model("map", mapSchema);
 
-async function newMap(mapID, markers) {
+async function newMap(mapID, markers, mapName) {
   try {
     await mapData.create({
       //Creating new map on mongodb
+      mapName: mapName,
       mapID: mapID,
       markers: markers,
     });
