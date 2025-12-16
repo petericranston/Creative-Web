@@ -28,6 +28,8 @@ export default function Create() {
   const [nameInputVisible, setNameInputVisible] = useState(false);
   const [mapName, setMapName] = useState("");
 
+  async function getMap() {}
+
   async function NewMarker() {
     const newMarker = { coords: [600, 600], popUp: "newMarker" };
 
@@ -55,7 +57,7 @@ export default function Create() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mapID, markers, mapName }),
+        body: JSON.stringify({ markers, mapName }),
       });
       if (!response.ok) {
         console.log("Failed to create map");
@@ -98,13 +100,18 @@ export default function Create() {
         )}
         <button className="create-buttons">My Maps</button>
         <div id="map-edits">
-          <button
-            className="create-buttons"
-            id="add-marker"
-            onClick={NewMarker}
-          >
-            Add Marker
-          </button>
+          <div id="map-edit-buttons">
+            <button
+              className="create-buttons"
+              id="add-marker"
+              onClick={NewMarker}
+            >
+              Add Marker
+            </button>
+            <button className="create-buttons" id="add-marker">
+              Save Edits
+            </button>
+          </div>
           <Map data={markers} />
         </div>
       </main>
