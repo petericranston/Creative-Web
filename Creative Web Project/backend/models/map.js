@@ -31,6 +31,12 @@ async function newMap(markers, mapName) {
   }
 }
 
+async function getMap(id) {
+  foundMap = mapData.findById(id);
+  return foundMap;
+}
+
 module.exports = {
   newMap,
+  getMap,
 };

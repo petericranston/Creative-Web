@@ -59,6 +59,9 @@ export default function Create() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ markers, mapName }),
       });
+      const data = await response.json();
+      setMapID(data);
+      console.log(mapID);
       if (!response.ok) {
         console.log("Failed to create map");
         return;

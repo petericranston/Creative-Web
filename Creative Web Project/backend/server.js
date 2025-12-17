@@ -101,12 +101,12 @@ app.post("/api/newMap", async (request, response) => {
   const markers = request.body.markers;
   const mapName = request.body.mapName;
 
-  console.log(mapID);
   console.log(markers);
   console.log(mapName);
-  await mapModel.newMap(mapID, markers, mapName);
-
-  response.json({ success: true });
+  await mapModel.newMap(markers, mapName);
+  response.json({
+    mapID: newMap._id,
+  });
 });
 
 app.listen(3000, () => {
