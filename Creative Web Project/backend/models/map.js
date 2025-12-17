@@ -30,12 +30,21 @@ async function newMap(markers, mapName) {
   }
 }
 
+async function saveChanges(id, markers) {
+  const result = await mapData.updateOne(
+    { _id: id },
+    { $set: { markers: markers } }
+  );
+  console.log(result);
+}
+
 async function getMap(id) {
-  foundMap = mapData.findById(id);
+  foundMap = await mapData.findById(id);
   return foundMap;
 }
 
 module.exports = {
   newMap,
   getMap,
+  saveChanges,
 };
