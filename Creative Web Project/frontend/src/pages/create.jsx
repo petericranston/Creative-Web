@@ -11,7 +11,26 @@ export default function Create() {
   const [nameInputVisible, setNameInputVisible] = useState(false);
   const [mapName, setMapName] = useState("");
 
-  async function getMap() {}
+  async function newMap() {
+    try {
+      const response = await fetch("/api/newMap", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ markers, mapName }),
+      });
+      const data = await response.json();
+      setMapID(data.mapID);
+      console.log(mapID);
+      setMarkers([]);
+      if (!response.ok) {
+        console.log("Failed to create map");
+        return;
+      }
+    } catch (error) {
+      console.log("Failed to create map", error);
+    }
+  }
 
   async function NewMarker() {
     const newMarker = { coords: [600, 600], popUp: "newMarker" };
@@ -34,25 +53,25 @@ export default function Create() {
     // }
   }
 
-  async function newMap() {
+  async function saveChanges() {
     try {
-      const response = await fetch("/api/newMap", {
+      const response = await fetch("/api/saveChanges", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ markers, mapName }),
+        body: JSON.stringify({ mapID, markers }),
       });
-      const data = await response.json();
-      setMapID(data.mapID);
-      console.log(mapID);
+
       if (!response.ok) {
-        console.log("Failed to create map");
+        console.log("Failed to save map");
         return;
       }
     } catch (error) {
-      console.log("Failed to create map", error);
+      console.log("Failed to save map", error);
     }
   }
+
+  async function getMap() {}
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -94,7 +113,11 @@ export default function Create() {
             >
               Add Marker
             </button>
-            <button className="create-buttons" id="add-marker">
+            <button
+              className="create-buttons"
+              id="add-marker"
+              onClick={saveChanges}
+            >
               Save Edits
             </button>
           </div>
