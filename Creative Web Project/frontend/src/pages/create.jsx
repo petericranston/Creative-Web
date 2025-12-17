@@ -5,24 +5,7 @@ import "../styles/create.css";
 import { useTransition } from "react";
 import { useSyncExternalStore } from "react";
 export default function Create() {
-  const [markers, setMarkers] = useState([
-    {
-      coords: [370, 780],
-      popUp: "Kings Landing",
-    },
-    {
-      coords: [730, 520],
-      popUp: "Winterfell",
-    },
-    {
-      coords: [330, 350],
-      popUp: "High Garden",
-    },
-    {
-      coords: [450, 600],
-      popUp: "Harrenhall",
-    },
-  ]);
+  const [markers, setMarkers] = useState([]);
 
   const [mapID, setMapID] = useState();
   const [nameInputVisible, setNameInputVisible] = useState(false);
@@ -60,7 +43,7 @@ export default function Create() {
         body: JSON.stringify({ markers, mapName }),
       });
       const data = await response.json();
-      setMapID(data);
+      setMapID(data.mapID);
       console.log(mapID);
       if (!response.ok) {
         console.log("Failed to create map");

@@ -18,13 +18,12 @@ const mapData = model("map", mapSchema);
 
 async function newMap(markers, mapName) {
   try {
-    await mapData.create({
+    const map = await mapData.create({
       //Creating new map on mongodb
       mapName: mapName,
       markers: markers,
     });
-
-    return true;
+    return map;
   } catch (err) {
     console.log("Error:", err);
     return false;

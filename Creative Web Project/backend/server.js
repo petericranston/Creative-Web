@@ -103,12 +103,12 @@ app.post("/api/newMap", async (request, response) => {
 
   console.log(markers);
   console.log(mapName);
-  await mapModel.newMap(markers, mapName);
+  const createdMap = await mapModel.newMap(markers, mapName);
   response.json({
-    mapID: newMap._id,
+    mapID: createdMap._id,
   });
 });
 
 app.listen(3000, () => {
-  console.log("Server running on port http://localhost:3000/");
+  console.log("Server running on port http://localhost:5173/");
 });
