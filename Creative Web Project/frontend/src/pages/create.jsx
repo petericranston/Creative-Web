@@ -123,6 +123,7 @@ export default function Create() {
           </div>
           <Map data={markers} />
         </div>
+        <div id="user-map-list"></div>
       </main>
     </div>
   );
