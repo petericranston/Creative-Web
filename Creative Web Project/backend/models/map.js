@@ -12,16 +12,18 @@ const mapSchema = new Schema({
   //Making database document layout
   mapName: String,
   markers: [markerSchema],
+  owner: String,
 });
 
 const mapData = model("map", mapSchema);
 
-async function newMap(markers, mapName) {
+async function newMap(markers, mapName, username) {
   try {
     const map = await mapData.create({
       //Creating new map on mongodb
       mapName: mapName,
       markers: markers,
+      owner: username,
     });
     return map;
   } catch (err) {
@@ -43,8 +45,13 @@ async function getMap(id) {
   return foundMap;
 }
 
+async function sendUsersMaps(username) {
+  return await mapData.find({ owner: username }).select("_id mapName").lean(); //Sending all maps of the username in the parameters
+}
+
 module.exports = {
   newMap,
   getMap,
   saveChanges,
+  sendUsersMaps,
 };

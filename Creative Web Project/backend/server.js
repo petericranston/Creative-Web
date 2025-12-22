@@ -102,7 +102,11 @@ app.post("/api/newMap", async (request, response) => {
 
   console.log(markers);
   console.log(mapName);
-  const createdMap = await mapModel.newMap(markers, mapName);
+  const createdMap = await mapModel.newMap(
+    markers,
+    mapName,
+    request.session.username
+  );
   response.json({
     mapID: createdMap._id,
   });
@@ -114,6 +118,15 @@ app.post("/api/saveChanges", async (request, response) => {
   console.log(mapID);
   console.log(markers);
   mapModel.saveChanges(mapID, markers);
+});
+
+app.get("/api/getUserMaps", async (request, response) => {
+  try {
+    const maps = await mapModel.sendUsersMaps(request.session.username); //Getting map data from database
+    response.json(maps); //Sending map data back
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.listen(3000, () => {

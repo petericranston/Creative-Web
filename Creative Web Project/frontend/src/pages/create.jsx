@@ -4,12 +4,24 @@ import Map from "../components/map";
 import "../styles/create.css";
 import { useTransition } from "react";
 import { useSyncExternalStore } from "react";
+import { useEffect } from "react";
 export default function Create() {
   const [markers, setMarkers] = useState([]);
-
   const [mapID, setMapID] = useState();
   const [nameInputVisible, setNameInputVisible] = useState(false);
   const [mapName, setMapName] = useState("");
+  const [maps, setMaps] = useState([]);
+
+  useEffect(() => {
+    const fetchMaps = async () => {
+      const response = await fetch("/api/getUserMaps", {
+        credentials: "include",
+      });
+      const data = await response.json();
+      setMaps(data);
+    };
+    fetchMaps();
+  });
 
   async function newMap() {
     try {
@@ -122,8 +134,19 @@ export default function Create() {
             </button>
           </div>
           <Map data={markers} />
+          <div id="user-map-list">
+            <h2>Your Maps:</h2>
+            <ul>
+              {maps.map((map) => (
+                <li key={map._id}>
+                  <button onClick={() => setMapID(map._id)}>
+                    {map.mapName}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-        <div id="user-map-list"></div>
       </main>
     </div>
   );
