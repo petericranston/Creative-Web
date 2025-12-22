@@ -48,10 +48,14 @@ async function getMap(id) {
 async function sendUsersMaps(username) {
   return await mapData.find({ owner: username }).select("_id mapName").lean(); //Sending all maps of the username in the parameters
 }
+async function sendMarkers(id) {
+  return await mapData.find({ _id: id }).select("markers").lean();
+}
 
 module.exports = {
   newMap,
   getMap,
   saveChanges,
   sendUsersMaps,
+  sendMarkers,
 };

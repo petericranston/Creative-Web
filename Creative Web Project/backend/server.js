@@ -129,6 +129,15 @@ app.get("/api/getUserMaps", async (request, response) => {
   }
 });
 
+app.get("/api/getMarkers/:id", async (request, response) => {
+  try {
+    const markers = await mapModel.sendMarkers(request.params.id);
+    response.json(markers);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server running on port http://localhost:5173/");
 });

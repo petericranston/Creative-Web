@@ -83,7 +83,11 @@ export default function Create() {
     }
   }
 
-  async function getMap() {}
+  async function getMarkers() {
+    const response = await fetch(`/api/getMarkers/${mapID}`);
+    const data = await response.json();
+    setMarkers(data.markers);
+  }
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -139,7 +143,9 @@ export default function Create() {
             <ul>
               {maps.map((map) => (
                 <li key={map._id}>
-                  <button onClick={() => setMapID(map._id)}>
+                  <button
+                    onClick={(() => setMapID(map._id), getMarkers(map._id))}
+                  >
                     {map.mapName}
                   </button>
                 </li>
