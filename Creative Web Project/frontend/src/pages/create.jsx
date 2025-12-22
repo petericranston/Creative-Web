@@ -21,7 +21,7 @@ export default function Create() {
       setMaps(data);
     };
     fetchMaps();
-  });
+  }, []);
 
   async function newMap() {
     try {
@@ -83,10 +83,11 @@ export default function Create() {
     }
   }
 
-  async function getMarkers() {
-    const response = await fetch(`/api/getMarkers/${mapID}`);
+  async function getMarkers(id) {
+    const response = await fetch(`/api/getMarkers/${id}`);
     const data = await response.json();
-    setMarkers(data.markers);
+    console.log(data);
+    setMarkers(data.markers ?? []);
   }
 
   const handleKeyDown = (e) => {
@@ -144,7 +145,9 @@ export default function Create() {
               {maps.map((map) => (
                 <li key={map._id}>
                   <button
-                    onClick={(() => setMapID(map._id), getMarkers(map._id))}
+                    onClick={() => {
+                      setMapID(map._id), getMarkers(map._id);
+                    }}
                   >
                     {map.mapName}
                   </button>
