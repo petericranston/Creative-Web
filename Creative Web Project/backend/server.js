@@ -118,6 +118,7 @@ app.post("/api/saveChanges", async (request, response) => {
   console.log(mapID);
   console.log(markers);
   mapModel.saveChanges(mapID, markers);
+  response.json({ success: true });
 });
 
 app.get("/api/getUserMaps", async (request, response) => {
@@ -132,7 +133,7 @@ app.get("/api/getUserMaps", async (request, response) => {
 app.get("/api/getMarkers/:id", async (request, response) => {
   try {
     const markers = await mapModel.sendMarkers(request.params.id);
-    response.json(markers);
+    response.json({ markers });
   } catch (error) {
     console.log(error);
   }
