@@ -33,8 +33,11 @@ export default function Create() {
       });
       const data = await response.json();
       setMapID(data.mapID);
+      setMarkers([]);
+      setMaps((prev) => [...prev, { _id: data.mapID, mapName: data.mapName }]); //Adding new map to the sidebar on the right without having to refresh the page
       console.log(mapID);
       setMarkers([]);
+
       if (!response.ok) {
         console.log("Failed to create map");
         return;

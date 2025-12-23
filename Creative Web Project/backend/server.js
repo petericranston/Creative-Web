@@ -109,6 +109,7 @@ app.post("/api/newMap", async (request, response) => {
   );
   response.json({
     mapID: createdMap._id,
+    mapName: createdMap.mapName,
   });
 });
 
