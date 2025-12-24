@@ -51,21 +51,6 @@ export default function Create() {
     const newMarker = { coords: [600, 600], popUp: "newMarker" };
 
     setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
-
-    // try {
-    //   const response = await fetch("/api/addMarker", {
-    //     method: "POST",
-    //     credentials: "include",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ mapID, markers }),
-    //   });
-    //   if (!response.ok) {
-    //     console.log("Marker failed to add.");
-    //     return;
-    //   }
-    // } catch (error) {
-    //   console.log("Marker failed to add ", error);
-    // }
   }
 
   async function saveChanges() {
