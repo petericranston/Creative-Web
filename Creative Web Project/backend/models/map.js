@@ -43,13 +43,13 @@ async function saveChanges(id, markers) {
 async function sendUsersMaps(username) {
   const map = await mapData
     .find({ owner: username })
-    .select("_id mapName")
+    .select("_id mapName ")
     .lean(); //Sending all maps of the username in the parameters
   return map;
 }
 
 async function sendAllMaps() {
-  const map = await mapData.find().select("_id mapName").lean(); //Sending all users maps
+  const map = await mapData.find().select("_id mapName owner").lean(); //Sending all users maps
   return map;
 }
 

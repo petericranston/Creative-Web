@@ -48,7 +48,7 @@ export default function ViewOthers() {
                       setMapID(map._id), getMarkers(map._id);
                     }}
                   >
-                    {map.mapName}
+                    {map.owner + " : " + map.mapName}
                   </button>
                 </li>
               ))}
