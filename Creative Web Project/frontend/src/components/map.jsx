@@ -9,8 +9,8 @@ import {
 import L, { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-export default function Map(props) {
-  let markers = props.data;
+export default function Map({ data }) {
+  let markers = data;
 
   const width = 950;
   const height = 1150;
