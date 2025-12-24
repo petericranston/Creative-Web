@@ -34,7 +34,7 @@ export default function Map(props) {
     >
       <ImageOverlay url="/images/BlankMap.png" bounds={bounds} />
       {markers.map((marker) => (
-        <Marker position={marker.coords} icon={customIcon}>
+        <Marker position={marker.coords} icon={customIcon} draggable>
           <Popup>{marker.popUp}</Popup>
         </Marker>
       ))}

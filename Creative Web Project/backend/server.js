@@ -97,7 +97,7 @@ app.get("/api/user", (request, response) => {
 
 app.post("/api/newMap", async (request, response) => {
   //Login functionality
-  const markers = request.body.markers;
+  const markers = [];
   const mapName = request.body.mapName;
 
   console.log(markers);
