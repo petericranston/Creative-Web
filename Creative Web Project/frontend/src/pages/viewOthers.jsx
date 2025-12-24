@@ -1,10 +1,61 @@
+import { marker, popup } from "leaflet";
+import { useState } from "react";
+import Map from "../components/map";
+import { useTransition } from "react";
+import { useSyncExternalStore } from "react";
+import { useEffect } from "react";
+import "../styles/create.css";
+
 export default function ViewOthers() {
+  const [markers, setMarkers] = useState([]);
+  const [mapID, setMapID] = useState();
+  const [nameInputVisible, setNameInputVisible] = useState(false);
+  const [mapName, setMapName] = useState("");
+  const [maps, setMaps] = useState([]);
+  useEffect(() => {
+    const fetchMaps = async () => {
+      const response = await fetch("/api/getAllMaps", {
+        credentials: "include",
+      });
+      const data = await response.json();
+      setMaps(data);
+    };
+    fetchMaps();
+  }, []);
+
+  async function getMarkers(id) {
+    const response = await fetch(`/api/getMarkers/${id}`);
+    const data = await response.json();
+    console.log(data);
+    setMarkers(data.markers ?? []);
+  }
+
   return (
     <div>
       <header>
-        <h1>View Others Maps</h1>
+        <h1>All Users Maps</h1>
       </header>
-      <main></main>
+      <main>
+        <div id="map-edits">
+          <Map data={markers} />
+          <div id="user-map-list">
+            <h2>Your Maps:</h2>
+            <ul>
+              {maps.map((map) => (
+                <li key={map._id}>
+                  <button
+                    onClick={() => {
+                      setMapID(map._id), getMarkers(map._id);
+                    }}
+                  >
+                    {map.mapName}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

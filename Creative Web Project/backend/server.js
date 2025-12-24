@@ -131,6 +131,15 @@ app.get("/api/getUserMaps", async (request, response) => {
   }
 });
 
+app.get("/api/getAllMaps", async (request, response) => {
+  try {
+    const maps = await mapModel.sendAllMaps(); //Getting all maps data from database
+    response.json(maps); //Sending map data back
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 app.get("/api/getMarkers/:id", async (request, response) => {
   try {
     const markers = await mapModel.sendMarkers(request.params.id);

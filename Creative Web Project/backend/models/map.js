@@ -47,6 +47,12 @@ async function sendUsersMaps(username) {
     .lean(); //Sending all maps of the username in the parameters
   return map;
 }
+
+async function sendAllMaps() {
+  const map = await mapData.find().select("_id mapName").lean(); //Sending all users maps
+  return map;
+}
+
 async function sendMarkers(id) {
   const map = await mapData.findById({ _id: id }).select("markers").lean();
   return map.markers;
@@ -57,4 +63,5 @@ module.exports = {
   saveChanges,
   sendUsersMaps,
   sendMarkers,
+  sendAllMaps,
 };
