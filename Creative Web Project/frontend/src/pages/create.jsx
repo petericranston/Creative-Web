@@ -107,7 +107,6 @@ export default function Create() {
             placeholder="Enter Map Name"
           />
         )}
-        <button className="create-buttons">My Maps</button>
         <div id="map-edits">
           <div id="map-edit-buttons">
             <button
