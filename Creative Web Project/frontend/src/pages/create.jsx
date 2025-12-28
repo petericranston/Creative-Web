@@ -47,7 +47,11 @@ export default function Create() {
   }
 
   async function NewMarker() {
-    const newMarker = { coords: [600, 600], popUp: "newMarker" };
+    const newMarker = {
+      id: crypto.randomUUID(),
+      coords: [600, 600],
+      popUp: "newMarker",
+    };
 
     setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
   }
@@ -104,6 +108,14 @@ export default function Create() {
     }
   };
 
+  function onMarkerMove(id, newCoords) {
+    setMarkers((prev) =>
+      prev.map((marker) =>
+        marker.id === id ? { ...marker, coords: newCoords } : marker
+      )
+    );
+  }
+
   return (
     <div>
       <header>
@@ -149,7 +161,7 @@ export default function Create() {
               Publish Map
             </button>
           </div>
-          <Map data={markers} />
+          <Map data={markers} onMarkerMove={onMarkerMove} />
           <div id="user-map-list">
             <h2>Your Maps:</h2>
             <ul>

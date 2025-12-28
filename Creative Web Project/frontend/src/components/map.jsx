@@ -9,7 +9,7 @@ import {
 import L, { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-export default function Map({ data }) {
+export default function Map({ data, onMarkerMove }) {
   let markers = data;
 
   const width = 950;
@@ -34,7 +34,18 @@ export default function Map({ data }) {
     >
       <ImageOverlay url="/images/BlankMap.png" bounds={bounds} />
       {markers.map((marker) => (
-        <Marker position={marker.coords} icon={customIcon} draggable>
+        <Marker
+          key={marker.id}
+          position={marker.coords}
+          icon={customIcon}
+          draggable
+          eventHandlers={{
+            dragend: (e) => {
+              const { lat, lng } = e.target.getLatLng();
+              onMarkerMove(marker.id, [lat, lng]);
+            },
+          }}
+        >
           <Popup>{marker.popUp}</Popup>
         </Marker>
       ))}
