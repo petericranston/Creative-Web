@@ -122,6 +122,12 @@ app.post("/api/saveChanges", async (request, response) => {
   response.json({ success: true });
 });
 
+app.post("/api/publishMap", async (request, response) => {
+  const mapID = request.body.mapID;
+  mapModel.publishMap(mapID);
+  response.json({ success: true });
+});
+
 app.get("/api/getUserMaps", async (request, response) => {
   try {
     const maps = await mapModel.sendUsersMaps(request.session.username); //Getting map data from database

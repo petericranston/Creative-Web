@@ -13,6 +13,7 @@ const mapSchema = new Schema({
   mapName: String,
   markers: [markerSchema],
   owner: String,
+  isPublished: Boolean,
 });
 
 const mapData = model("map", mapSchema);
@@ -24,6 +25,7 @@ async function newMap(markers, mapName, username) {
       mapName: mapName,
       markers: markers,
       owner: username,
+      isPublished: false,
     });
     return map;
   } catch (err) {
@@ -38,6 +40,13 @@ async function saveChanges(id, markers) {
     { $set: { markers: markers } }
   );
   console.log(result);
+}
+
+async function publishMap(id) {
+  const result = await mapData.updateOne(
+    { _id: id },
+    { $set: { isPublished: true } }
+  );
 }
 
 async function sendUsersMaps(username) {
@@ -64,4 +73,5 @@ module.exports = {
   sendUsersMaps,
   sendMarkers,
   sendAllMaps,
+  publishMap,
 };

@@ -1,15 +1,12 @@
 .create-buttons {
   margin: 20px;
   padding: 20px;
+  width: 100px;
+  height: 100px;
 }
 
 #map-edits {
   display: flex;
   flex-direction: row;
   align-items: center;
-}
-
-#add-marker {
-  width: 100px;
-  height: 100px;
 }

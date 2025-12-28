@@ -70,6 +70,24 @@ export default function Create() {
     }
   }
 
+  async function publishMap() {
+    try {
+      const response = await fetch("/api/publishMap", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mapID }),
+      });
+
+      if (!response.ok) {
+        console.log("Failed to publish map");
+        return;
+      }
+    } catch (error) {
+      console.log("Failed to publish map", error);
+    }
+  }
+
   async function getMarkers(id) {
     const response = await fetch(`/api/getMarkers/${id}`);
     const data = await response.json();
@@ -118,10 +136,17 @@ export default function Create() {
             </button>
             <button
               className="create-buttons"
-              id="add-marker"
+              id="save-changes"
               onClick={saveChanges}
             >
               Save Edits
+            </button>
+            <button
+              className="create-buttons"
+              id="publish-map"
+              onClick={publishMap}
+            >
+              Publish Map
             </button>
           </div>
           <Map data={markers} />
