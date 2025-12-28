@@ -58,7 +58,10 @@ async function sendUsersMaps(username) {
 }
 
 async function sendAllMaps() {
-  const map = await mapData.find().select("_id mapName owner").lean(); //Sending all users maps
+  const map = await mapData
+    .find()
+    .select("_id mapName owner isPublished")
+    .lean(); //Sending all users maps
   return map;
 }
 

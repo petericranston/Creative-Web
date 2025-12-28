@@ -9,8 +9,6 @@ import "../styles/create.css";
 export default function ViewOthers() {
   const [markers, setMarkers] = useState([]);
   const [mapID, setMapID] = useState();
-  const [nameInputVisible, setNameInputVisible] = useState(false);
-  const [mapName, setMapName] = useState("");
   const [maps, setMaps] = useState([]);
   useEffect(() => {
     const fetchMaps = async () => {
@@ -41,17 +39,19 @@ export default function ViewOthers() {
           <div id="user-map-list">
             <h2>Your Maps:</h2>
             <ul>
-              {maps.map((map) => (
-                <li key={map._id}>
-                  <button
-                    onClick={() => {
-                      setMapID(map._id), getMarkers(map._id);
-                    }}
-                  >
-                    {map.mapName + " by: " + map.owner}
-                  </button>
-                </li>
-              ))}
+              {maps
+                .filter((map) => map.isPublished === true)
+                .map((map) => (
+                  <li key={map._id}>
+                    <button
+                      onClick={() => {
+                        setMapID(map._id), getMarkers(map._id);
+                      }}
+                    >
+                      {map.mapName + " by: " + map.owner}
+                    </button>
+                  </li>
+                ))}
             </ul>
           </div>
         </div>
