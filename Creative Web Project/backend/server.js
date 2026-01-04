@@ -116,9 +116,15 @@ app.post("/api/newMap", async (request, response) => {
 app.post("/api/saveChanges", async (request, response) => {
   const mapID = request.body.mapID;
   const markers = request.body.markers;
+
+  const cleanedMarkers = markers.map(({ coords, popUp }) => ({
+    coords,
+    popUp,
+  }));
+
   console.log(mapID);
   console.log(markers);
-  mapModel.saveChanges(mapID, markers);
+  mapModel.saveChanges(mapID, cleanedMarkers);
   response.json({ success: true });
 });
 

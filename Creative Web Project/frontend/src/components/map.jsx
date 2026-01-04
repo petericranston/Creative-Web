@@ -35,14 +35,14 @@ export default function Map({ data, onMarkerMove }) {
       <ImageOverlay url="/images/BlankMap.png" bounds={bounds} />
       {markers.map((marker) => (
         <Marker
-          key={marker.id}
+          key={marker.clientID}
           position={marker.coords}
           icon={customIcon}
           draggable
           eventHandlers={{
             dragend: (e) => {
               const { lat, lng } = e.target.getLatLng();
-              onMarkerMove(marker.id, [lat, lng]);
+              onMarkerMove(marker.clientID, [lat, lng]);
             },
           }}
         >

@@ -48,9 +48,9 @@ export default function Create() {
 
   async function NewMarker() {
     const newMarker = {
-      id: crypto.randomUUID(),
       coords: [600, 600],
       popUp: "newMarker",
+      clientID: crypto.randomUUID(),
     };
 
     setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
@@ -95,8 +95,13 @@ export default function Create() {
   async function getMarkers(id) {
     const response = await fetch(`/api/getMarkers/${id}`);
     const data = await response.json();
-    console.log(data);
-    setMarkers(data.markers ?? []);
+
+    const markersWithClientIds = data.markers.map((marker) => ({
+      ...marker,
+      clientID: crypto.randomUUID(),
+    }));
+
+    setMarkers(markersWithClientIds);
   }
 
   const handleKeyDown = (e) => {
@@ -108,10 +113,10 @@ export default function Create() {
     }
   };
 
-  function onMarkerMove(id, newCoords) {
+  function onMarkerMove(clientID, newCoords) {
     setMarkers((prev) =>
       prev.map((marker) =>
-        marker.id === id ? { ...marker, coords: newCoords } : marker
+        marker.clientID === clientID ? { ...marker, coords: newCoords } : marker
       )
     );
   }
