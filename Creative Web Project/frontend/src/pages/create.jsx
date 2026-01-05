@@ -9,7 +9,10 @@ export default function Create() {
   const [markers, setMarkers] = useState([]);
   const [mapID, setMapID] = useState();
   const [nameInputVisible, setNameInputVisible] = useState(false);
+  const [markerInputVisible, setMarkerInputVisible] = useState(false);
+
   const [mapName, setMapName] = useState("");
+  const [markerPopUp, setMarkerPopUp] = useState("");
   const [maps, setMaps] = useState([]);
 
   useEffect(() => {
@@ -49,7 +52,7 @@ export default function Create() {
   async function NewMarker() {
     const newMarker = {
       coords: [600, 600],
-      popUp: "newMarker",
+      popUp: markerPopUp,
       clientID: crypto.randomUUID(),
     };
 
@@ -104,12 +107,20 @@ export default function Create() {
     setMarkers(markersWithClientIds);
   }
 
-  const handleKeyDown = (e) => {
+  const handleKeyDownMap = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
       setNameInputVisible(false);
       console.log(mapName);
       newMap();
+    }
+  };
+
+  const handleKeyDownMarker = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      setMarkerInputVisible(false);
+      NewMarker();
     }
   };
 
@@ -138,7 +149,7 @@ export default function Create() {
             type="text"
             value={mapName}
             onChange={(e) => setMapName(e.target.value)}
-            onKeyDown={handleKeyDown}
+            onKeyDown={handleKeyDownMap}
             placeholder="Enter Map Name"
           />
         )}
@@ -147,10 +158,19 @@ export default function Create() {
             <button
               className="create-buttons"
               id="add-marker"
-              onClick={NewMarker}
+              onClick={() => setMarkerInputVisible(true)}
             >
               Add Marker
             </button>
+            {markerInputVisible && (
+              <input
+                type="text"
+                value={markerPopUp}
+                onChange={(e) => setMarkerPopUp(e.target.value)}
+                onKeyDown={handleKeyDownMarker}
+                placeholder="Enter Marker Name"
+              />
+            )}
             <button
               className="create-buttons"
               id="save-changes"
