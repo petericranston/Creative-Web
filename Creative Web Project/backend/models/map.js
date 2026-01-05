@@ -6,6 +6,7 @@ const { ObjectId } = require("mongoose").Types;
 const markerSchema = new Schema({
   coords: Array,
   popUp: String,
+  type: String,
 });
 
 const mapSchema = new Schema({

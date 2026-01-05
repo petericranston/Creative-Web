@@ -19,10 +19,12 @@ export default function Map({ data, onMarkerMove }) {
     [height, width],
   ];
 
-  const customIcon = new Icon({
-    iconUrl: "./images/marker.png",
-    iconSize: [38, 38],
-  });
+  const Icons = {
+    basicIcon: new L.Icon({
+      iconUrl: "./images/markers/marker.png",
+      iconSize: [38, 38],
+    }),
+  };
 
   return (
     <MapContainer
@@ -37,7 +39,7 @@ export default function Map({ data, onMarkerMove }) {
         <Marker
           key={marker.clientID}
           position={marker.coords}
-          icon={customIcon}
+          icon={Icons[marker.type]}
           draggable
           eventHandlers={{
             dragend: (e) => {

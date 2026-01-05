@@ -20,6 +20,7 @@ export default function Navbar() {
       console.log("Error logging out");
     }
   };
+
   return (
     //Nav buttons
     <nav>

@@ -117,9 +117,10 @@ app.post("/api/saveChanges", async (request, response) => {
   const mapID = request.body.mapID;
   const markers = request.body.markers;
 
-  const cleanedMarkers = markers.map(({ coords, popUp }) => ({
+  const cleanedMarkers = markers.map(({ coords, popUp, type }) => ({
     coords,
     popUp,
+    type,
   }));
 
   console.log(mapID);

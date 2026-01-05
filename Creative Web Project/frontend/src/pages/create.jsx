@@ -49,10 +49,11 @@ export default function Create() {
     }
   }
 
-  async function NewMarker() {
+  async function NewMarker(type) {
     const newMarker = {
       coords: [600, 600],
       popUp: markerPopUp,
+      type: type,
       clientID: crypto.randomUUID(),
     };
 
@@ -120,7 +121,7 @@ export default function Create() {
     if (e.key === "Enter") {
       e.preventDefault();
       setMarkerInputVisible(false);
-      NewMarker();
+      NewMarker("basicIcon");
     }
   };
 
