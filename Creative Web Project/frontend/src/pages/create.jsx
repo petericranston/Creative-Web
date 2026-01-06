@@ -9,7 +9,11 @@ export default function Create() {
   const [markers, setMarkers] = useState([]);
   const [mapID, setMapID] = useState();
   const [nameInputVisible, setNameInputVisible] = useState(false);
-  const [markerInputVisible, setMarkerInputVisible] = useState(false);
+  const [capitalInputVisible, setCapitalInputVisible] = useState(false);
+  const [largeSettlementInputVisible, setLargeSettlementInputVisible] =
+    useState(false);
+  const [smallSettlementInputVisible, setSmallSettlementInputVisible] =
+    useState(false);
 
   const [mapName, setMapName] = useState("");
   const [markerPopUp, setMarkerPopUp] = useState("");
@@ -115,7 +119,13 @@ export default function Create() {
         setNameInputVisible(false);
         newMap();
       } else if (type == 2) {
-        setMarkerInputVisible(false);
+        setCapitalInputVisible(false);
+        NewMarker("basicIcon");
+      } else if (type == 3) {
+        setLargeSettlementInputVisible(false);
+        NewMarker("basicIcon");
+      } else if (type == 4) {
+        setSmallSettlementInputVisible(false);
         NewMarker("basicIcon");
       }
     }
@@ -155,16 +165,48 @@ export default function Create() {
             <button
               className="create-buttons"
               id="add-marker"
-              onClick={() => setMarkerInputVisible(true)}
+              onClick={() => setCapitalInputVisible(true)}
             >
-              Add Marker
+              Capital
             </button>
-            {markerInputVisible && (
+            {capitalInputVisible && (
               <input
                 type="text"
                 value={markerPopUp}
                 onChange={(e) => setMarkerPopUp(e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e, 2)}
+                placeholder="Enter Marker Name"
+              />
+            )}
+            <button
+              className="create-buttons"
+              id="add-marker"
+              onClick={() => setLargeSettlementInputVisible(true)}
+            >
+              Large Settlement
+            </button>
+            {largeSettlementInputVisible && (
+              <input
+                type="text"
+                value={markerPopUp}
+                onChange={(e) => setMarkerPopUp(e.target.value)}
+                onKeyDown={(e) => handleKeyDown(e, 3)}
+                placeholder="Enter Marker Name"
+              />
+            )}
+            <button
+              className="create-buttons"
+              id="add-marker"
+              onClick={() => setSmallSettlementInputVisible(true)}
+            >
+              Small Settlement
+            </button>
+            {smallSettlementInputVisible && (
+              <input
+                type="text"
+                value={markerPopUp}
+                onChange={(e) => setMarkerPopUp(e.target.value)}
+                onKeyDown={(e) => handleKeyDown(e, 4)}
                 placeholder="Enter Marker Name"
               />
             )}

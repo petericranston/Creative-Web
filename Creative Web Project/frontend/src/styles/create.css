@@ -1,7 +1,7 @@
 .create-buttons {
   margin: 20px;
   padding: 20px;
-  width: 100px;
+  width: 120px;
   height: 100px;
 }
 
@@ -10,4 +10,9 @@
   flex-direction: row;
   align-items: center;
   width: 100%;
+}
+
+#map-edit-buttons {
+  display: flex;
+  flex-direction: column;
 }
