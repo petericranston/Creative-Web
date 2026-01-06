@@ -8,22 +8,22 @@ export default function Home() {
     {
       coords: [370, 780],
       popUp: "Kings Landing",
-      type: "basicIcon",
+      type: "Capital",
     },
     {
       coords: [730, 520],
       popUp: "Winterfell",
-      type: "basicIcon",
+      type: "LargeSettlement",
     },
     {
       coords: [330, 350],
       popUp: "High Garden",
-      type: "basicIcon",
+      type: "SmallSettlement",
     },
     {
       coords: [450, 600],
       popUp: "Harrenhall",
-      type: "basicIcon",
+      type: "SmallSettlement",
     },
   ]);
 

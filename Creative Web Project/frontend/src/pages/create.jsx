@@ -120,13 +120,13 @@ export default function Create() {
         newMap();
       } else if (type == 2) {
         setCapitalInputVisible(false);
-        NewMarker("basicIcon");
+        NewMarker("Capital");
       } else if (type == 3) {
         setLargeSettlementInputVisible(false);
-        NewMarker("basicIcon");
+        NewMarker("LargeSettlement");
       } else if (type == 4) {
         setSmallSettlementInputVisible(false);
-        NewMarker("basicIcon");
+        NewMarker("SmallSettlement");
       }
     }
   };
