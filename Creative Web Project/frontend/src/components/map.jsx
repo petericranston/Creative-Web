@@ -22,7 +22,7 @@ export default function Map({ data, onMarkerMove }) {
   const Icons = {
     Capital: new L.Icon({
       iconUrl: "./images/markers/Capital-Icon.png",
-      iconSize: [50, 50],
+      iconSize: [60, 60],
     }),
     LargeSettlement: new L.Icon({
       iconUrl: "./images/markers/LargeSettlement-Icon.png",
