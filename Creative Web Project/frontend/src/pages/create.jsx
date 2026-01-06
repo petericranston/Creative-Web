@@ -1,4 +1,4 @@
-import { marker, popup } from "leaflet";
+import { icon, marker, popup } from "leaflet";
 import { useState } from "react";
 import Map from "../components/map";
 import "../styles/create.css";
@@ -108,20 +108,16 @@ export default function Create() {
     setMarkers(markersWithClientIds);
   }
 
-  const handleKeyDownMap = (e) => {
+  const handleKeyDown = (e, type) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      setNameInputVisible(false);
-      console.log(mapName);
-      newMap();
-    }
-  };
-
-  const handleKeyDownMarker = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      setMarkerInputVisible(false);
-      NewMarker("basicIcon");
+      if (type == 1) {
+        setNameInputVisible(false);
+        newMap();
+      } else if (type == 2) {
+        setMarkerInputVisible(false);
+        NewMarker("basicIcon");
+      }
     }
   };
 
@@ -150,7 +146,7 @@ export default function Create() {
             type="text"
             value={mapName}
             onChange={(e) => setMapName(e.target.value)}
-            onKeyDown={handleKeyDownMap}
+            onKeyDown={(e) => handleKeyDown(e, 1)}
             placeholder="Enter Map Name"
           />
         )}
@@ -168,7 +164,7 @@ export default function Create() {
                 type="text"
                 value={markerPopUp}
                 onChange={(e) => setMarkerPopUp(e.target.value)}
-                onKeyDown={handleKeyDownMarker}
+                onKeyDown={(e) => handleKeyDown(e, 2)}
                 placeholder="Enter Marker Name"
               />
             )}

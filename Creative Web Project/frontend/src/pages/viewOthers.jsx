@@ -37,7 +37,7 @@ export default function ViewOthers() {
         <div id="map-edits">
           <Map data={markers} />
           <div id="user-map-list">
-            <h2>Your Maps:</h2>
+            <h2>Maps:</h2>
             <ul>
               {maps
                 .filter((map) => map.isPublished === true)
