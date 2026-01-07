@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Map from "../components/map";
+import "../styles/homepage.css";
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -39,7 +40,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div>
+    <div id="home-page">
       <header>
         <h1>Home Page</h1>
       </header>
