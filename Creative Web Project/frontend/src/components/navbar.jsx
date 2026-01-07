@@ -28,6 +28,7 @@ export default function Navbar() {
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
+    //Checking if the user is logged in, so that i can make the create link visible or not
     fetch("/api/user", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => setLoggedIn(data.loggedIn));
