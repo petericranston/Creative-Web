@@ -42,7 +42,7 @@ export default function Home() {
   return (
     <div id="home-page">
       <header>
-        <h1>Home Page</h1>
+        <h1>Myth Mapper</h1>
       </header>
       <main>
         {user ? <h2>Welcome, {user}</h2> : <h2>Your not logged in</h2>}

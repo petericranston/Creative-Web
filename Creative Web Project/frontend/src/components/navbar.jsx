@@ -40,7 +40,7 @@ export default function Navbar() {
       <Link to="/">Home</Link> | <Link to="/login">Login</Link> |{" "}
       <Link to="/register">Register</Link> |{" "}
       {loggedIn && <Link to="/create">Create</Link>} {loggedIn && "|"}{" "}
-      <Link to="/viewOthers">View Others Maps</Link> |{" "}
+      <Link to="/viewOthers">View Others' Maps</Link> |{" "}
       <button id="logoutBtn" onClick={logout}>
         Logout
       </button>
