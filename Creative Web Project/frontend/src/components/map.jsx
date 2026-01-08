@@ -9,7 +9,7 @@ import {
 import L, { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-export default function Map({ data, onMarkerMove }) {
+export default function Map({ data, onMarkerMove, onSelectMarker }) {
   let markers = data;
 
   const width = 950;
@@ -50,6 +50,7 @@ export default function Map({ data, onMarkerMove }) {
           icon={Icons[marker.type]}
           draggable
           eventHandlers={{
+            click: () => onSelectMarker(marker.clientID),
             dragend: (e) => {
               const { lat, lng } = e.target.getLatLng();
               onMarkerMove(marker.clientID, [lat, lng]);

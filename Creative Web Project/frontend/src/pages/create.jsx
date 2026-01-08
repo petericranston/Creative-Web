@@ -7,6 +7,7 @@ import { useSyncExternalStore } from "react";
 import { useEffect } from "react";
 export default function Create() {
   const [markers, setMarkers] = useState([]);
+  const [selectedMarker, setSelectedMarker] = useState(null);
   const [mapID, setMapID] = useState();
   const [nameInputVisible, setNameInputVisible] = useState(false);
   const [capitalInputVisible, setCapitalInputVisible] = useState(false);
@@ -139,27 +140,20 @@ export default function Create() {
     );
   }
 
+  function deleteSelectedMarker() {
+    if (!selectedMarker) return;
+
+    setMarkers((prev) => prev.filter((m) => m.clientID !== selectedMarker));
+
+    setSelectedMarker(null);
+  }
+
   return (
     <div>
       <header>
         <h1>Create a map</h1>
       </header>
       <main>
-        <button
-          className="create-buttons"
-          onClick={() => setNameInputVisible(true)}
-        >
-          New Map
-        </button>
-        {nameInputVisible && (
-          <input
-            type="text"
-            value={mapName}
-            onChange={(e) => setMapName(e.target.value)}
-            onKeyDown={(e) => handleKeyDown(e, 1)}
-            placeholder="Enter Map Name"
-          />
-        )}
         <div id="map-edits">
           <div id="map-edit-buttons">
             <button
@@ -210,6 +204,10 @@ export default function Create() {
                 placeholder="Enter Marker Name"
               />
             )}
+
+            <button className="create-buttons" onClick={deleteSelectedMarker}>
+              Delete Marker
+            </button>
             <button
               className="create-buttons"
               id="save-changes"
@@ -225,8 +223,27 @@ export default function Create() {
               Publish Map
             </button>
           </div>
-          <Map data={markers} onMarkerMove={onMarkerMove} />
+          <Map
+            data={markers}
+            onSelectMarker={setSelectedMarker}
+            onMarkerMove={onMarkerMove}
+          />
           <div id="user-map-list">
+            <button
+              className="create-buttons"
+              onClick={() => setNameInputVisible(true)}
+            >
+              New Map
+            </button>
+            {nameInputVisible && (
+              <input
+                type="text"
+                value={mapName}
+                onChange={(e) => setMapName(e.target.value)}
+                onKeyDown={(e) => handleKeyDown(e, 1)}
+                placeholder="Enter Map Name"
+              />
+            )}
             <h2>Your Maps:</h2>
             <ul>
               {maps.map((map) => (
