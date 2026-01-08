@@ -6,21 +6,22 @@ import { useTransition } from "react";
 import { useSyncExternalStore } from "react";
 import { useEffect } from "react";
 export default function Create() {
-  const [markers, setMarkers] = useState([]);
-  const [selectedMarker, setSelectedMarker] = useState(null);
-  const [mapID, setMapID] = useState();
-  const [nameInputVisible, setNameInputVisible] = useState(false);
-  const [capitalInputVisible, setCapitalInputVisible] = useState(false);
+  const [markers, setMarkers] = useState([]); //Marker array
+  const [selectedMarker, setSelectedMarker] = useState(null); //For deleting markers
+  const [mapID, setMapID] = useState(); //For knowing what map is currently being used (adding markers, saving)
+  const [nameInputVisible, setNameInputVisible] = useState(false); //Displaying the input for the map name
+  const [capitalInputVisible, setCapitalInputVisible] = useState(false); //Naming capital marker variable
   const [largeSettlementInputVisible, setLargeSettlementInputVisible] =
-    useState(false);
+    useState(false); //Naming large settlement variable
   const [smallSettlementInputVisible, setSmallSettlementInputVisible] =
-    useState(false);
+    useState(false); //Naming small settlement variable
 
-  const [mapName, setMapName] = useState("");
-  const [markerPopUp, setMarkerPopUp] = useState("");
-  const [maps, setMaps] = useState([]);
+  const [mapName, setMapName] = useState(""); //Setting the map name when its being created
+  const [markerPopUp, setMarkerPopUp] = useState(""); //Entering the marker variable
+  const [maps, setMaps] = useState([]); //Variable to store all maps the user has made
 
   useEffect(() => {
+    //Getting all the users maps from mongodb, so they can access them when they want
     const fetchMaps = async () => {
       const response = await fetch("/api/getUserMaps", {
         credentials: "include",
