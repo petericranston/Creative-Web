@@ -36,6 +36,7 @@ async function registerUser(username, password) {
 }
 
 async function checkUser(username, password) {
+  //Checking if user exists
   //Finding user
   const user = await userData.findOne({
     username: username,

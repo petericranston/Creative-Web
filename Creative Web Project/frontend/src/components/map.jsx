@@ -10,8 +10,9 @@ import L, { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 export default function Map({ data, onMarkerMove, onSelectMarker }) {
-  let markers = data;
+  let markers = data; //Setting the marker array to the array that is sent through
 
+  //Setting map dimensions
   const width = 950;
   const height = 1150;
   const bounds = [
@@ -20,6 +21,7 @@ export default function Map({ data, onMarkerMove, onSelectMarker }) {
   ];
 
   const Icons = {
+    //Setting up different images for different markers
     Capital: new L.Icon({
       iconUrl: "./images/markers/Capital-Icon.png",
       iconSize: [60, 60],
@@ -35,14 +37,18 @@ export default function Map({ data, onMarkerMove, onSelectMarker }) {
   };
 
   return (
-    <MapContainer
-      crs={L.CRS.Simple}
-      bounds={bounds}
-      maxBounds={bounds}
+    <MapContainer //Map
+      crs={L.CRS.Simple} //Setting map to use pixels as coordinates instead of longitude and latitude
+      bounds={bounds} //Setting map bounds
+      maxBounds={bounds} //Telling the map that the image can't leave the bounds of the map
       maxBoundsViscosity={1.0}
       id="map-container"
     >
-      <ImageOverlay url="/images/BlankMap.png" bounds={bounds} />
+      <ImageOverlay url="/images/BlankMap.png" bounds={bounds} />{" "}
+      {
+        //Setting the background image for the map
+        //Mapping the markers to the marker array that is sent into the component
+      }
       {markers.map((marker) => (
         <Marker
           key={marker.clientID}
@@ -57,7 +63,13 @@ export default function Map({ data, onMarkerMove, onSelectMarker }) {
             },
           }}
         >
+          {
+            //Handles the clicking on and movement of the markers
+          }
           <Popup>{marker.popUp}</Popup>
+          {
+            //Sets the popup to the markers popup in the array
+          }
         </Marker>
       ))}
     </MapContainer>

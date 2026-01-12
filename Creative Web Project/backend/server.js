@@ -75,6 +75,7 @@ app.post("/api/login", async (request, response) => {
 });
 
 app.post("/api/logout", async (request, response) => {
+  //Logs user out and destroys session
   if (!request.session.username) {
     return response.json({ loggedIn: false });
   } else {
@@ -96,28 +97,30 @@ app.get("/api/user", (request, response) => {
 });
 
 app.post("/api/newMap", async (request, response) => {
-  //Login functionality
+  //New map functionality
   const markers = [];
-  const mapName = request.body.mapName;
+  const mapName = request.body.mapName; //Sets the name the user wrote in a text field to a variable
 
-  console.log(markers);
-  console.log(mapName);
   const createdMap = await mapModel.newMap(
+    //Uses map model to run a function that creates a new map
     markers,
     mapName,
     request.session.username
   );
   response.json({
+    //sends back the mapid and mapname
     mapID: createdMap._id,
     mapName: createdMap.mapName,
   });
 });
 
 app.post("/api/saveChanges", async (request, response) => {
+  //Takes the mapid and markers array sent through saves them to the database
   const mapID = request.body.mapID;
   const markers = request.body.markers;
 
   const cleanedMarkers = markers.map(({ coords, popUp, type }) => ({
+    //This is to remove the id that each marker had, otherwise there is database issues
     coords,
     popUp,
     type,
@@ -125,11 +128,12 @@ app.post("/api/saveChanges", async (request, response) => {
 
   console.log(mapID);
   console.log(markers);
-  mapModel.saveChanges(mapID, cleanedMarkers);
+  mapModel.saveChanges(mapID, cleanedMarkers); //Saves the markers to the map with that id
   response.json({ success: true });
 });
 
 app.post("/api/publishMap", async (request, response) => {
+  //Sends the mapid to the model that runs the function to publish the map
   const mapID = request.body.mapID;
   mapModel.publishMap(mapID);
   response.json({ success: true });
@@ -154,6 +158,7 @@ app.get("/api/getAllMaps", async (request, response) => {
 });
 
 app.get("/api/getMarkers/:id", async (request, response) => {
+  //Uses the mapid to run the sendmarkers function
   try {
     const markers = await mapModel.sendMarkers(request.params.id);
     response.json({ markers });

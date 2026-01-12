@@ -6,6 +6,7 @@ export default function Home() {
   const [user, setUser] = useState(null);
 
   const [markers, setMarkers] = useState([
+    //Creating a array of markers to be sent through the component
     {
       coords: [370, 780],
       popUp: "Kings Landing",
@@ -29,6 +30,7 @@ export default function Home() {
   ]);
 
   useEffect(() => {
+    //Checking if the user is logged in to be used on the home page to change some text
     async function getUser() {
       const response = await fetch("/api/user");
       const data = await response.json();

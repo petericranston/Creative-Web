@@ -12,6 +12,7 @@ export default function ViewOthers() {
   const [maps, setMaps] = useState([]);
   useEffect(() => {
     const fetchMaps = async () => {
+      //Getting all maps to be displayed as buttons
       const response = await fetch("/api/getAllMaps", {
         credentials: "include",
       });
@@ -22,6 +23,7 @@ export default function ViewOthers() {
   }, []);
 
   async function getMarkers(id) {
+    //Getting markers using the mapid of the button that is clicked on
     const response = await fetch(`/api/getMarkers/${id}`);
     const data = await response.json();
     console.log(data);

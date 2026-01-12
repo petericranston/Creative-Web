@@ -33,6 +33,7 @@ export default function Create() {
   }, []);
 
   async function newMap() {
+    //Function to create a new map
     try {
       const response = await fetch("/api/newMap", {
         method: "POST",
@@ -56,6 +57,7 @@ export default function Create() {
   }
 
   async function NewMarker(type) {
+    //Function to create a new marker and append it to the markers array
     const newMarker = {
       coords: [600, 600],
       popUp: markerPopUp,
@@ -67,6 +69,7 @@ export default function Create() {
   }
 
   async function saveChanges() {
+    //Sends the markers array and mapid to the backend to be saved to the database
     try {
       const response = await fetch("/api/saveChanges", {
         method: "POST",
@@ -85,6 +88,7 @@ export default function Create() {
   }
 
   async function publishMap() {
+    //Sends the mapid to the backend to change the maps isPublished variable to true, so that in the view others page, the map is visible
     try {
       const response = await fetch("/api/publishMap", {
         method: "POST",
@@ -103,6 +107,7 @@ export default function Create() {
   }
 
   async function getMarkers(id) {
+    //Gets the markers from the database and overwrites the marker array with new array, and adds a clientid to each marker for future use
     const response = await fetch(`/api/getMarkers/${id}`);
     const data = await response.json();
 
@@ -115,6 +120,7 @@ export default function Create() {
   }
 
   const handleKeyDown = (e, type) => {
+    //Handles the enter button down for each marker button type (this is clicked after the user names the marker in an input field)
     if (e.key === "Enter") {
       e.preventDefault();
       if (type == 1) {
@@ -134,6 +140,7 @@ export default function Create() {
   };
 
   function onMarkerMove(clientID, newCoords) {
+    //Changes the markers coordinates in the marker array once the user has moved the marker
     setMarkers((prev) =>
       prev.map((marker) =>
         marker.clientID === clientID ? { ...marker, coords: newCoords } : marker
@@ -142,6 +149,7 @@ export default function Create() {
   }
 
   function deleteSelectedMarker() {
+    //Removes the chosen marker from the marker array
     if (!selectedMarker) return;
 
     setMarkers((prev) => prev.filter((m) => m.clientID !== selectedMarker));

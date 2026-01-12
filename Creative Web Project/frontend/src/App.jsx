@@ -10,6 +10,7 @@ import Navbar from "./components/navbar";
 import ViewOthers from "./pages/viewOthers";
 
 function App() {
+  //Nav bar
   return (
     <Router>
       <Navbar />

@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [formData, setFormData] = useState({ username: "", password: "" }); //Variable to store user data
 
+  //Handles the data the user sent in through the fields
   function handleUsername(e) {
     setFormData((prev) => ({ ...prev, username: e.target.value }));
   }
@@ -13,6 +14,7 @@ export default function Login() {
   }
 
   async function submit(e) {
+    //Sends data through
     e.preventDefault();
 
     try {

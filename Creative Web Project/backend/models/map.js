@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 const { ObjectId } = require("mongoose").Types;
 
+//Schemas to organise the data sent to the database
 const markerSchema = new Schema({
   coords: Array,
   popUp: String,
@@ -20,6 +21,7 @@ const mapSchema = new Schema({
 const mapData = model("map", mapSchema);
 
 async function newMap(markers, mapName, username) {
+  //New map function
   try {
     const map = await mapData.create({
       //Creating new map on mongodb
@@ -36,7 +38,9 @@ async function newMap(markers, mapName, username) {
 }
 
 async function saveChanges(id, markers) {
+  //Save changes function
   const result = await mapData.updateOne(
+    //Updates the map the new array of markers
     { _id: id },
     { $set: { markers: markers } }
   );
@@ -44,6 +48,7 @@ async function saveChanges(id, markers) {
 }
 
 async function publishMap(id) {
+  //Changes the map ispublished variable to true
   const result = await mapData.updateOne(
     { _id: id },
     { $set: { isPublished: true } }
@@ -67,6 +72,7 @@ async function sendAllMaps() {
 }
 
 async function sendMarkers(id) {
+  //Sends markers of the mapid
   const map = await mapData.findById({ _id: id }).select("markers").lean();
   return map.markers;
 }
