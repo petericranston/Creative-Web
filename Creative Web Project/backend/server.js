@@ -37,7 +37,7 @@ app.use(
     cookie: { maxAge: oneHour },
     resave: false,
     saveUninitialized: false,
-  })
+  }),
 );
 
 app.use((request, response, next) => {
@@ -60,10 +60,9 @@ app.post("/api/login", async (request, response) => {
   //Login functionality
   const user = await userModel.checkUser(
     request.body.username,
-    request.body.password
+    request.body.password,
   );
 
-  // response.sendFile(path.join(__dirname, "/views", "app.html"));
   if (user) {
     //Setting session data to use throughout the app
     request.session.username = user.username;
@@ -105,7 +104,7 @@ app.post("/api/newMap", async (request, response) => {
     //Uses map model to run a function that creates a new map
     markers,
     mapName,
-    request.session.username
+    request.session.username,
   );
   response.json({
     //sends back the mapid and mapname

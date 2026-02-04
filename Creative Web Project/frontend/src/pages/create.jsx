@@ -143,8 +143,10 @@ export default function Create() {
     //Changes the markers coordinates in the marker array once the user has moved the marker
     setMarkers((prev) =>
       prev.map((marker) =>
-        marker.clientID === clientID ? { ...marker, coords: newCoords } : marker
-      )
+        marker.clientID === clientID
+          ? { ...marker, coords: newCoords }
+          : marker,
+      ),
     );
   }
 
@@ -259,7 +261,7 @@ export default function Create() {
                 <li key={map._id}>
                   <button
                     onClick={() => {
-                      setMapID(map._id), getMarkers(map._id);
+                      (setMapID(map._id), getMarkers(map._id));
                     }}
                   >
                     {map.mapName}
