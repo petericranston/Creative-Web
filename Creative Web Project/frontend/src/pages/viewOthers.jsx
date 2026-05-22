@@ -1,14 +1,9 @@
-import { marker, popup } from "leaflet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Map from "../components/map";
-import { useTransition } from "react";
-import { useSyncExternalStore } from "react";
-import { useEffect } from "react";
 import "../styles/create.css";
 
 export default function ViewOthers() {
   const [markers, setMarkers] = useState([]);
-  const [mapID, setMapID] = useState();
   const [maps, setMaps] = useState([]);
   useEffect(() => {
     const fetchMaps = async () => {
@@ -27,7 +22,11 @@ export default function ViewOthers() {
     const response = await fetch(`/api/getMarkers/${id}`);
     const data = await response.json();
     console.log(data);
-    setMarkers(data.markers ?? []);
+    const markersWithClientIds = (data.markers ?? []).map((marker) => ({
+      ...marker,
+      clientID: crypto.randomUUID(),
+    }));
+    setMarkers(markersWithClientIds);
   }
 
   return (
@@ -46,9 +45,7 @@ export default function ViewOthers() {
                 .map((map) => (
                   <li key={map._id}>
                     <button
-                      onClick={() => {
-                        setMapID(map._id), getMarkers(map._id);
-                      }}
+                      onClick={() => getMarkers(map._id)}
                     >
                       {map.mapName + " by: " + map.owner}
                     </button>

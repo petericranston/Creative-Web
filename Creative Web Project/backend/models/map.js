@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const { Schema, model } = mongoose;
-const { ObjectId } = require("mongoose").Types;
 
 //Schemas to organise the data sent to the database
 const markerSchema = new Schema({

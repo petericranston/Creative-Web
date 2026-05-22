@@ -47,8 +47,8 @@ export default function Home() {
         <h1>Myth Mapper</h1>
       </header>
       <main>
-        {user ? <h2>Welcome, {user}</h2> : <h2>Your not logged in</h2>}
-        <h3>Log in to create you own world!</h3>
+        {user ? <h2>Welcome, {user}</h2> : <h2>You're not logged in</h2>}
+        <h3>Log in to create your own world!</h3>
         <h3>Or explore other users worlds!</h3>
       </main>
       <Map data={markers} />

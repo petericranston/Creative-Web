@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const { Schema, model } = mongoose;
-const { ObjectId } = require("mongoose").Types;
 
 const userSchema = new Schema({
   //Making database document layout

@@ -1,10 +1,6 @@
-import { icon, marker, popup } from "leaflet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Map from "../components/map";
 import "../styles/create.css";
-import { useTransition } from "react";
-import { useSyncExternalStore } from "react";
-import { useEffect } from "react";
 export default function Create() {
   const [markers, setMarkers] = useState([]); //Marker array
   const [selectedMarker, setSelectedMarker] = useState(null); //For deleting markers
@@ -170,7 +166,7 @@ export default function Create() {
           <div id="map-edit-buttons">
             <button
               className="create-buttons"
-              id="add-marker"
+              id="add-capital-marker"
               onClick={() => setCapitalInputVisible(true)}
             >
               Capital
@@ -187,7 +183,7 @@ export default function Create() {
             )}
             <button
               className="create-buttons"
-              id="add-marker"
+              id="add-large-settlement-marker"
               onClick={() => setLargeSettlementInputVisible(true)}
             >
               Large Settlement
@@ -263,7 +259,8 @@ export default function Create() {
                 <li key={map._id}>
                   <button
                     onClick={() => {
-                      (setMapID(map._id), getMarkers(map._id));
+                      setMapID(map._id);
+                      getMarkers(map._id);
                     }}
                   >
                     {map.mapName}

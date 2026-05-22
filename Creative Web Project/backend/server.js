@@ -9,11 +9,9 @@ const mapModel = require("./models/map");
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 
 const sessions = require("express-session");
-const cookieParser = require("cookie-parser");
 
 const mongoDBUsername = process.env.mongoDBUsername; //Getting data from env file
 const mongoDBPassword = process.env.mongoDBPassword;
@@ -70,6 +68,7 @@ app.post("/api/login", async (request, response) => {
     response.json({ success: true });
   } else {
     console.log("Login Failed");
+    response.status(401).json({ success: false, message: "Invalid credentials" });
   }
 });
 
@@ -80,6 +79,7 @@ app.post("/api/logout", async (request, response) => {
   } else {
     request.session.destroy();
     response.clearCookie("connect.sid");
+    response.json({ success: true });
   }
 });
 
@@ -167,5 +167,5 @@ app.get("/api/getMarkers/:id", async (request, response) => {
 });
 
 app.listen(3000, () => {
-  console.log("Server running on port http://localhost:5173/");
+  console.log("Server running on port http://localhost:3000/");
 });

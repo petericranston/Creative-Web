@@ -6,7 +6,7 @@ import {
   Popup,
   useMapEvent,
 } from "react-leaflet";
-import L, { Icon } from "leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 export default function Map({ data, onMarkerMove, onSelectMarker }) {
@@ -49,15 +49,16 @@ export default function Map({ data, onMarkerMove, onSelectMarker }) {
         //Setting the background image for the map
         //Mapping the markers to the marker array that is sent into the component
       }
-      {markers.map((marker) => (
+      {markers.map((marker, index) => (
         <Marker
-          key={marker.clientID}
+          key={marker.clientID ?? marker._id ?? index}
           position={marker.coords}
           icon={Icons[marker.type]}
-          draggable
+          draggable={!!onMarkerMove}
           eventHandlers={{
-            click: () => onSelectMarker(marker.clientID),
+            click: () => onSelectMarker && onSelectMarker(marker.clientID),
             dragend: (e) => {
+              if (!onMarkerMove) return;
               const { lat, lng } = e.target.getLatLng();
               onMarkerMove(marker.clientID, [lat, lng]);
             },
