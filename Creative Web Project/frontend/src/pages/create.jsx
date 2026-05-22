@@ -51,7 +51,9 @@ export default function Create() {
 
   useEffect(() => {
     const fetchMaps = async () => {
-      const response = await fetch("/api/getUserMaps", { credentials: "include" });
+      const response = await fetch("/api/getUserMaps", {
+        credentials: "include",
+      });
       const data = await response.json();
       setMaps(data);
     };
@@ -60,7 +62,10 @@ export default function Create() {
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
-      if (isDirty) { e.preventDefault(); e.returnValue = ""; }
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -69,7 +74,10 @@ export default function Create() {
   // ── History ──────────────────────────────────────────────────────────────
 
   function pushHistory(currentMarkers, currentPolylines) {
-    setHistory((prev) => [...prev, { markers: currentMarkers, polylines: currentPolylines, imageUrl }]);
+    setHistory((prev) => [
+      ...prev,
+      { markers: currentMarkers, polylines: currentPolylines, imageUrl },
+    ]);
   }
 
   function undo() {
@@ -103,14 +111,21 @@ export default function Create() {
       setIsDirty(false);
       setDrawingMode(false);
       setCurrentDrawPath([]);
-      setMaps((prev) => [...prev, { _id: data.mapID, mapName: data.mapName, isPublished: false }]);
+      setMaps((prev) => [
+        ...prev,
+        { _id: data.mapID, mapName: data.mapName, isPublished: false },
+      ]);
     } catch (error) {
       console.log("Failed to create map", error);
     }
   }
 
   async function loadMap(id) {
-    if (isDirty && !window.confirm("You have unsaved changes. Switch maps anyway?")) return;
+    if (
+      isDirty &&
+      !window.confirm("You have unsaved changes. Switch maps anyway?")
+    )
+      return;
     setMapID(id);
     setIsDirty(false);
     setHistory([]);
@@ -121,7 +136,9 @@ export default function Create() {
     setDescription(selectedMap?.description ?? "");
     const response = await fetch(`/api/getMarkers/${id}`);
     const data = await response.json();
-    setMarkers(data.markers.map((m) => ({ ...m, clientID: crypto.randomUUID() })));
+    setMarkers(
+      data.markers.map((m) => ({ ...m, clientID: crypto.randomUUID() })),
+    );
     setPolylines(data.polylines ?? []);
     setImageUrl(data.imageUrl ?? "");
   }
@@ -135,7 +152,10 @@ export default function Create() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mapID, markers, polylines, imageUrl }),
       });
-      if (!response.ok) { setSaveStatus("error"); return; }
+      if (!response.ok) {
+        setSaveStatus("error");
+        return;
+      }
       setSaveStatus("saved");
       setIsDirty(false);
       setTimeout(() => setSaveStatus("idle"), 2000);
@@ -154,9 +174,14 @@ export default function Create() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mapID }),
       });
-      if (!response.ok) { setPublishStatus("error"); return; }
+      if (!response.ok) {
+        setPublishStatus("error");
+        return;
+      }
       setMaps((prev) =>
-        prev.map((m) => m._id === mapID ? { ...m, isPublished: !isPublished } : m),
+        prev.map((m) =>
+          m._id === mapID ? { ...m, isPublished: !isPublished } : m,
+        ),
       );
       setPublishStatus(isPublished ? "unpublished" : "published");
       setTimeout(() => setPublishStatus("idle"), 2000);
@@ -194,7 +219,9 @@ export default function Create() {
       body: JSON.stringify({ mapName: trimmed }),
     });
     if (response.ok) {
-      setMaps((prev) => prev.map((m) => m._id === id ? { ...m, mapName: trimmed } : m));
+      setMaps((prev) =>
+        prev.map((m) => (m._id === id ? { ...m, mapName: trimmed } : m)),
+      );
     }
     setRenamingId(null);
   }
@@ -208,7 +235,7 @@ export default function Create() {
       body: JSON.stringify({ description: value }),
     });
     setMaps((prev) =>
-      prev.map((m) => m._id === mapID ? { ...m, description: value } : m),
+      prev.map((m) => (m._id === mapID ? { ...m, description: value } : m)),
     );
   }
 
@@ -255,7 +282,9 @@ export default function Create() {
   function onMarkerMove(clientID, newCoords) {
     pushHistory(markers, polylines);
     setMarkers((prev) =>
-      prev.map((m) => m.clientID === clientID ? { ...m, coords: newCoords } : m),
+      prev.map((m) =>
+        m.clientID === clientID ? { ...m, coords: newCoords } : m,
+      ),
     );
     setIsDirty(true);
   }
@@ -270,7 +299,9 @@ export default function Create() {
     if (!editingMarker) return;
     setMarkers((prev) =>
       prev.map((m) =>
-        m.clientID === editingMarker.clientID ? { ...m, popUp: editingMarker.name } : m,
+        m.clientID === editingMarker.clientID
+          ? { ...m, popUp: editingMarker.name }
+          : m,
       ),
     );
     setEditingMarker(null);
@@ -279,13 +310,18 @@ export default function Create() {
 
   function handlePolylineEdit(index) {
     const line = polylines[index];
-    if (line !== undefined) setEditingPolyline({ index, label: line.label ?? "" });
+    if (line !== undefined)
+      setEditingPolyline({ index, label: line.label ?? "" });
   }
 
   function saveEditedPolylineLabel() {
     if (!editingPolyline) return;
     setPolylines((prev) =>
-      prev.map((p, i) => i === editingPolyline.index ? { ...p, label: editingPolyline.label } : p),
+      prev.map((p, i) =>
+        i === editingPolyline.index
+          ? { ...p, label: editingPolyline.label }
+          : p,
+      ),
     );
     setEditingPolyline(null);
     setIsDirty(true);
@@ -299,7 +335,11 @@ export default function Create() {
   }
 
   function placeMarkerAt(type) {
-    const defaultNames = { Capital: "Capital", LargeSettlement: "Large Settlement", SmallSettlement: "Small Settlement" };
+    const defaultNames = {
+      Capital: "Capital",
+      LargeSettlement: "Large Settlement",
+      SmallSettlement: "Small Settlement",
+    };
     pushHistory(markers, polylines);
     setMarkers((prev) => [
       ...prev,
@@ -378,7 +418,11 @@ export default function Create() {
 
   function createMarker() {
     if (!markerType) return;
-    const defaults = { Capital: "Capital", LargeSettlement: "Large Settlement", SmallSettlement: "Small Settlement" };
+    const defaults = {
+      Capital: "Capital",
+      LargeSettlement: "Large Settlement",
+      SmallSettlement: "Small Settlement",
+    };
     NewMarker(markerType, markerName.trim() || defaults[markerType]);
     setMarkerName("");
     setMarkerType(null);
@@ -396,7 +440,12 @@ export default function Create() {
 
   // ── Labels ────────────────────────────────────────────────────────────────
 
-  const saveLabel = { idle: "Save Edits", saving: "Saving...", saved: "Saved!", error: "Save Failed" }[saveStatus];
+  const saveLabel = {
+    idle: "Save Edits",
+    saving: "Saving...",
+    saved: "Saved!",
+    error: "Save Failed",
+  }[saveStatus];
   const publishLabel = {
     idle: isPublished ? "Unpublish" : "Publish Map",
     saving: "...",
@@ -406,58 +455,83 @@ export default function Create() {
   }[publishStatus];
 
   return (
-    <div onClick={() => { contextMenu && setContextMenu(null); showMarkerPopup && setShowMarkerPopup(false); }}>
+    <div
+      onClick={() => {
+        contextMenu && setContextMenu(null);
+        showMarkerPopup && setShowMarkerPopup(false);
+      }}
+    >
       <header>
         <h1>Create a map</h1>
       </header>
 
       <main>
         <div id="map-edits">
-
           {/* ── Left panel ── */}
           <div id="map-edit-buttons">
             <div className="marker-btn-wrapper">
-            <button
-              className={`create-buttons ${showMarkerPopup ? "active-map" : ""}`}
-              onClick={() => setShowMarkerPopup((p) => !p)}
-              disabled={!mapID}
-            >
-              Create Marker
-            </button>
+              <button
+                className={`create-buttons ${showMarkerPopup ? "active-map" : ""}`}
+                onClick={() => setShowMarkerPopup((p) => !p)}
+                disabled={!mapID}
+              >
+                Create Marker
+              </button>
 
-            {showMarkerPopup && (
-              <div className="marker-popup" onClick={(e) => e.stopPropagation()}>
-                {[
-                  { type: "Capital",         symbol: "★", label: "Capital",          color: "#e8c84a" },
-                  { type: "LargeSettlement", symbol: "◆", label: "Large Settlement", color: "#b07828" },
-                  { type: "SmallSettlement", symbol: "●", label: "Small Settlement", color: "#7a6028" },
-                ].map(({ type, symbol, label, color }) => (
-                  <button
-                    key={type}
-                    className={`marker-type-btn ${markerType === type ? "type-selected" : ""}`}
-                    onClick={() => setMarkerType(type)}
-                  >
-                    <span style={{ color, fontSize: "13px" }}>{symbol}</span>
-                    {label}
-                  </button>
-                ))}
-                <input
-                  type="text"
-                  value={markerName}
-                  onChange={(e) => setMarkerName(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") createMarker(); if (e.key === "Escape") setShowMarkerPopup(false); }}
-                  placeholder="Name (optional)"
-                />
-                <button
-                  className="create-buttons status-btn saved"
-                  onClick={createMarker}
-                  disabled={!markerType}
-                  style={{ width: "100%", margin: 0 }}
+              {showMarkerPopup && (
+                <div
+                  className="marker-popup"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  Add
-                </button>
-              </div>
-            )}
+                  {[
+                    {
+                      type: "Capital",
+                      symbol: "★",
+                      label: "Capital",
+                      color: "#e8c84a",
+                    },
+                    {
+                      type: "LargeSettlement",
+                      symbol: "◆",
+                      label: "Large Settlement",
+                      color: "#b07828",
+                    },
+                    {
+                      type: "SmallSettlement",
+                      symbol: "●",
+                      label: "Small Settlement",
+                      color: "#7a6028",
+                    },
+                  ].map(({ type, symbol, label, color }) => (
+                    <button
+                      key={type}
+                      className={`marker-type-btn ${markerType === type ? "type-selected" : ""}`}
+                      onClick={() => setMarkerType(type)}
+                    >
+                      <span style={{ color, fontSize: "13px" }}>{symbol}</span>
+                      {label}
+                    </button>
+                  ))}
+                  <input
+                    type="text"
+                    value={markerName}
+                    onChange={(e) => setMarkerName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") createMarker();
+                      if (e.key === "Escape") setShowMarkerPopup(false);
+                    }}
+                    placeholder="Name (optional)"
+                  />
+                  <button
+                    className="create-buttons status-btn saved"
+                    onClick={createMarker}
+                    disabled={!markerType}
+                    style={{ width: "100%", margin: 0 }}
+                  >
+                    Add
+                  </button>
+                </div>
+              )}
             </div>
 
             <button
@@ -563,36 +637,67 @@ export default function Create() {
 
           {/* ── Right panel ── */}
           <div id="user-map-list">
-            <button className="create-buttons" onClick={() => setNameInputVisible(true)}>
+            <button
+              className="create-buttons"
+              onClick={() => setNameInputVisible(true)}
+            >
               New Map
             </button>
             {nameInputVisible && (
-              <input type="text" value={mapName} onChange={(e) => setMapName(e.target.value)}
-                onKeyDown={handleNewMapKeyDown} placeholder="Enter Map Name" autoFocus />
+              <input
+                type="text"
+                value={mapName}
+                onChange={(e) => setMapName(e.target.value)}
+                onKeyDown={handleNewMapKeyDown}
+                placeholder="Enter Map Name"
+                autoFocus
+              />
             )}
             <h2>Your Maps:</h2>
             <ul>
               {maps.map((map) => (
                 <li key={map._id} className="map-list-item">
                   {renamingId === map._id ? (
-                    <input className="rename-input" value={renameValue}
+                    <input
+                      className="rename-input"
+                      value={renameValue}
                       onChange={(e) => setRenameValue(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === "Enter") saveRename(map._id); if (e.key === "Escape") setRenamingId(null); }}
-                      onBlur={() => saveRename(map._id)} autoFocus />
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveRename(map._id);
+                        if (e.key === "Escape") setRenamingId(null);
+                      }}
+                      onBlur={() => saveRename(map._id)}
+                      autoFocus
+                    />
                   ) : (
                     <button
                       className={`map-name-btn ${mapID === map._id ? "active-map" : ""}`}
                       onClick={() => loadMap(map._id)}
                     >
                       {map.mapName}
-                      {map.isPublished && <span className="published-badge">●</span>}
+                      {map.isPublished && (
+                        <span className="published-badge">●</span>
+                      )}
                     </button>
                   )}
                   <div className="map-actions">
-                    <button className="icon-btn" title="Rename"
-                      onClick={() => { setRenamingId(map._id); setRenameValue(map.mapName); }}>✎</button>
-                    <button className="icon-btn delete-btn" title="Delete"
-                      onClick={() => deleteMap(map._id)}>✕</button>
+                    <button
+                      className="icon-btn"
+                      title="Rename"
+                      onClick={() => {
+                        setRenamingId(map._id);
+                        setRenameValue(map.mapName);
+                      }}
+                    >
+                      ✎
+                    </button>
+                    <button
+                      className="icon-btn delete-btn"
+                      title="Delete"
+                      onClick={() => deleteMap(map._id)}
+                    >
+                      ✕
+                    </button>
                   </div>
                 </li>
               ))}
@@ -609,20 +714,37 @@ export default function Create() {
           onClick={(e) => e.stopPropagation()}
         >
           <button onClick={() => placeMarkerAt("Capital")}>+ Capital</button>
-          <button onClick={() => placeMarkerAt("LargeSettlement")}>+ Large Settlement</button>
-          <button onClick={() => placeMarkerAt("SmallSettlement")}>+ Small Settlement</button>
-          <button className="cancel-option" onClick={() => setContextMenu(null)}>Cancel</button>
+          <button onClick={() => placeMarkerAt("LargeSettlement")}>
+            + Large Settlement
+          </button>
+          <button onClick={() => placeMarkerAt("SmallSettlement")}>
+            + Small Settlement
+          </button>
+          <button
+            className="cancel-option"
+            onClick={() => setContextMenu(null)}
+          >
+            Cancel
+          </button>
         </div>
       )}
 
       {/* ── Edit marker name dialog ── */}
       {editingMarker && (
-        <div className="edit-marker-overlay" onClick={() => setEditingMarker(null)}>
-          <div className="edit-marker-dialog" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="edit-marker-overlay"
+          onClick={() => setEditingMarker(null)}
+        >
+          <div
+            className="edit-marker-dialog"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h4>Rename Marker</h4>
             <input
               value={editingMarker.name}
-              onChange={(e) => setEditingMarker((prev) => ({ ...prev, name: e.target.value }))}
+              onChange={(e) =>
+                setEditingMarker((prev) => ({ ...prev, name: e.target.value }))
+              }
               onKeyDown={(e) => {
                 if (e.key === "Enter") saveEditedMarkerName();
                 if (e.key === "Escape") setEditingMarker(null);
@@ -631,7 +753,12 @@ export default function Create() {
             />
             <div className="dialog-buttons">
               <button onClick={() => setEditingMarker(null)}>Cancel</button>
-              <button className="status-btn saved" onClick={saveEditedMarkerName}>Save</button>
+              <button
+                className="status-btn saved"
+                onClick={saveEditedMarkerName}
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>
@@ -639,13 +766,24 @@ export default function Create() {
 
       {/* ── Edit path name dialog ── */}
       {editingPolyline && (
-        <div className="edit-marker-overlay" onClick={() => setEditingPolyline(null)}>
-          <div className="edit-marker-dialog" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="edit-marker-overlay"
+          onClick={() => setEditingPolyline(null)}
+        >
+          <div
+            className="edit-marker-dialog"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h4>Rename Path</h4>
             <input
               value={editingPolyline.label}
               placeholder="Path name (optional)"
-              onChange={(e) => setEditingPolyline((prev) => ({ ...prev, label: e.target.value }))}
+              onChange={(e) =>
+                setEditingPolyline((prev) => ({
+                  ...prev,
+                  label: e.target.value,
+                }))
+              }
               onKeyDown={(e) => {
                 if (e.key === "Enter") saveEditedPolylineLabel();
                 if (e.key === "Escape") setEditingPolyline(null);
@@ -654,7 +792,12 @@ export default function Create() {
             />
             <div className="dialog-buttons">
               <button onClick={() => setEditingPolyline(null)}>Cancel</button>
-              <button className="status-btn saved" onClick={saveEditedPolylineLabel}>Save</button>
+              <button
+                className="status-btn saved"
+                onClick={saveEditedPolylineLabel}
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>

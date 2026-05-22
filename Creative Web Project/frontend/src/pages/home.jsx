@@ -14,10 +14,10 @@ export default function Home() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [markers] = useState([
-    { coords: [370, 780], popUp: "Kings Landing",  type: "Capital"          },
-    { coords: [730, 520], popUp: "Winterfell",     type: "LargeSettlement"  },
-    { coords: [330, 350], popUp: "High Garden",    type: "SmallSettlement"  },
-    { coords: [450, 600], popUp: "Harrenhall",     type: "SmallSettlement"  },
+    { coords: [370, 780], popUp: "Kings Landing", type: "Capital" },
+    { coords: [730, 520], popUp: "Winterfell", type: "LargeSettlement" },
+    { coords: [330, 350], popUp: "High Garden", type: "SmallSettlement" },
+    { coords: [450, 600], popUp: "Harrenhall", type: "SmallSettlement" },
   ]);
 
   useEffect(() => {
@@ -78,9 +78,11 @@ export default function Home() {
       });
       const data = await response.json();
       if (!response.ok) {
-        setError(authMode === "login"
-          ? "Incorrect username or password."
-          : (data.message || "Registration failed. Please try again."));
+        setError(
+          authMode === "login"
+            ? "Incorrect username or password."
+            : data.message || "Registration failed. Please try again.",
+        );
         return;
       }
       storeUser(formData.username);
@@ -106,17 +108,25 @@ export default function Home() {
             Log in / Register
           </button>
         )}
-        <h3>Or explore other users worlds!</h3>
+        <h3>Create a map or explore other users worlds!</h3>
       </main>
       <Map data={markers} />
 
       {showAuth && (
         <div className="auth-overlay" onClick={closeAuth}>
           <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="auth-close" onClick={closeAuth} aria-label="Close">✕</button>
+            <button
+              className="auth-close"
+              onClick={closeAuth}
+              aria-label="Close"
+            >
+              ✕
+            </button>
 
             <div className="auth-slider">
-              <div className={`auth-slider-thumb ${authMode === "register" ? "register" : ""}`} />
+              <div
+                className={`auth-slider-thumb ${authMode === "register" ? "register" : ""}`}
+              />
               <button
                 className={`auth-tab ${authMode === "login" ? "active" : ""}`}
                 onClick={() => switchMode("login")}
@@ -138,20 +148,28 @@ export default function Home() {
                 type="text"
                 placeholder="Username"
                 value={formData.username}
-                onChange={(e) => setFormData((prev) => ({ ...prev, username: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, username: e.target.value }))
+                }
                 autoFocus
               />
               <input
                 type="password"
                 placeholder="Password"
                 value={formData.password}
-                onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, password: e.target.value }))
+                }
               />
               {error && <p className="form-error">{error}</p>}
               <button type="submit" disabled={loading}>
                 {loading
-                  ? (authMode === "login" ? "Logging in..." : "Registering...")
-                  : (authMode === "login" ? "Login" : "Register")}
+                  ? authMode === "login"
+                    ? "Logging in..."
+                    : "Registering..."
+                  : authMode === "login"
+                    ? "Login"
+                    : "Register"}
               </button>
             </form>
           </div>
