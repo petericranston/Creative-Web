@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const { Schema, model } = mongoose;
 
@@ -20,10 +21,11 @@ async function registerUser(username, password) {
       return false;
     }
 
+    const hashedPassword = await bcrypt.hash(password, 12);
+
     await userData.create({
-      //Creating new user on mongodb
       username: username,
-      password: password,
+      password: hashedPassword,
       admin: false,
     });
 
@@ -35,13 +37,11 @@ async function registerUser(username, password) {
 }
 
 async function checkUser(username, password) {
-  //Checking if user exists
-  //Finding user
-  const user = await userData.findOne({
-    username: username,
-    password: password,
-  });
-  return user;
+  const user = await userData.findOne({ username: username });
+  if (!user) return null;
+
+  const match = await bcrypt.compare(password, user.password);
+  return match ? user : null;
 }
 
 module.exports = {
