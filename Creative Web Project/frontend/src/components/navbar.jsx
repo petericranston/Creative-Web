@@ -20,6 +20,12 @@ export default function Navbar() {
       });
   }, [location.pathname]);
 
+  useEffect(() => {
+    const handler = () => setLoggedIn(!!getStoredUser());
+    window.addEventListener("auth-change", handler);
+    return () => window.removeEventListener("auth-change", handler);
+  }, []);
+
   const logout = async () => {
     try {
       await fetch("/api/logout", { method: "POST", credentials: "include" });
@@ -38,13 +44,10 @@ export default function Navbar() {
     <nav>
       <Link to="/">Home</Link>
       <span>|</span>
-      <Link to="/login">Login</Link>
-      <span>|</span>
-      <Link to="/register">Register</Link>
-      <span>|</span>
       {loggedIn && <><Link to="/create">Create</Link><span>|</span></>}
       <Link to="/viewOthers">View Others' Maps</Link>
       <span>|</span>
+      {!loggedIn && <><Link to="/?auth=login">Login / Register</Link><span>|</span></>}
       <button id="logoutBtn" onClick={logout}>Logout</button>
     </nav>
   );

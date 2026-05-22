@@ -1,9 +1,7 @@
 // import React, { useEffect, useState } from "react";
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
-import Register from "./pages/register";
-import Login from "./pages/login";
 import Home from "./pages/home";
 import Create from "./pages/create";
 import Navbar from "./components/navbar";
@@ -16,8 +14,8 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Navigate to="/?auth=login" replace />} />
+        <Route path="/register" element={<Navigate to="/?auth=register" replace />} />
         <Route path="/create" element={<Create />} />
         <Route path="/viewOthers" element={<ViewOthers />} />
       </Routes>

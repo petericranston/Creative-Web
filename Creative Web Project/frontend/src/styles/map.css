@@ -65,12 +65,9 @@
   object-fit: contain;
 }
 
-.legend-marker {
-  transform: scale(0.5);
-  transform-origin: center;
+.legend-svg {
   flex-shrink: 0;
-  animation: none !important;
-  pointer-events: none;
+  display: block;
 }
 
 .legend-line {
@@ -81,69 +78,20 @@
 }
 
 /* ── Custom map markers ── */
-.marker-capital,
-.marker-large,
-.marker-small {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.marker-svg-wrapper {
   cursor: grab;
-  transition: transform 0.15s ease;
   user-select: none;
   -webkit-user-drag: none;
-  box-sizing: border-box;
+  display: block;
+  transition: filter 0.15s ease;
 }
 
-.marker-capital {
-  width: 50px;
-  height: 50px;
-  background: radial-gradient(circle at 40% 38%, #2e2208, #1a1208);
-  border: 2px solid #c9a84c;
-  border-radius: 50%;
-  font-size: 22px;
-  color: #e8c84a;
-  box-shadow: 0 0 8px rgba(201, 168, 76, 0.5), 0 3px 10px rgba(0, 0, 0, 0.85);
-  text-shadow: 0 0 8px rgba(201, 168, 76, 0.7);
-  animation: capitalGlow 3s ease-in-out infinite;
+.marker-svg-wrapper:hover {
+  filter: brightness(1.15) drop-shadow(0 2px 4px rgba(0,0,0,0.6));
 }
 
-.marker-large {
-  width: 36px;
-  height: 36px;
-  background: radial-gradient(circle at 40% 38%, #231a08, #140f06);
-  border: 2px solid #8b6420;
-  border-radius: 6px;
-  font-size: 15px;
-  color: #b07828;
-  box-shadow: 0 0 5px rgba(139, 100, 32, 0.35), 0 2px 8px rgba(0, 0, 0, 0.8);
-}
-
-.marker-small {
-  width: 22px;
-  height: 22px;
-  background: radial-gradient(circle at 40% 38%, #1c1608, #100d05);
-  border: 2px solid #6a5018;
-  border-radius: 50%;
-  font-size: 9px;
-  color: #7a6028;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.75);
-}
-
-.marker-capital:hover,
-.marker-large:hover,
-.marker-small:hover {
-  transform: scale(1.2);
-}
-
-.marker-selected {
-  outline: 2px solid #c9a84c;
-  outline-offset: 3px;
-  box-shadow: 0 0 14px rgba(201, 168, 76, 0.85), 0 3px 10px rgba(0, 0, 0, 0.85) !important;
-}
-
-@keyframes capitalGlow {
-  0%, 100% { box-shadow: 0 0 8px rgba(201, 168, 76, 0.5), 0 3px 10px rgba(0, 0, 0, 0.85); }
-  50%       { box-shadow: 0 0 20px rgba(201, 168, 76, 0.8), 0 3px 10px rgba(0, 0, 0, 0.85); }
+.marker-svg-wrapper.marker-selected {
+  filter: drop-shadow(0 0 3px #c9a84c) drop-shadow(0 0 6px rgba(201,168,76,0.7));
 }
 
 /* ── Marker tooltips ── */

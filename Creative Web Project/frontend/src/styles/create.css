@@ -224,7 +224,16 @@
 }
 
 /* ── Create marker popup ── */
+.marker-btn-wrapper {
+  position: relative;
+  width: 130px;
+}
+
 .marker-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
   width: 130px;
   background: #13100a;
   border: 1px solid #3a2e1a;

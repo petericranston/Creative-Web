@@ -101,10 +101,10 @@ app.post("/api/saveChanges", async (request, response) => {
   if (!request.session.username) {
     return response.status(401).json({ success: false, message: "Not logged in" });
   }
-  const { mapID, markers, polylines = [] } = request.body;
+  const { mapID, markers, polylines = [], imageUrl } = request.body;
   const cleanedMarkers = markers.map(({ coords, popUp, type }) => ({ coords, popUp, type }));
   const cleanedPolylines = polylines.map(({ points, color, label }) => ({ points, color: color || "#8b0000", label: label || "" }));
-  const success = await mapModel.saveChanges(mapID, request.session.username, cleanedMarkers, cleanedPolylines);
+  const success = await mapModel.saveChanges(mapID, request.session.username, cleanedMarkers, cleanedPolylines, imageUrl);
   success
     ? response.json({ success: true })
     : response.status(403).json({ success: false, message: "Not authorised" });

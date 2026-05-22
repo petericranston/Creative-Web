@@ -36,10 +36,12 @@ async function newMap(markers, mapName, username) {
   }
 }
 
-async function saveChanges(id, username, markers, polylines) {
+async function saveChanges(id, username, markers, polylines, imageUrl) {
+  const update = { markers, polylines };
+  if (imageUrl !== undefined) update.imageUrl = imageUrl;
   const result = await mapData.updateOne(
     { _id: id, owner: username },
-    { $set: { markers, polylines } },
+    { $set: update },
   );
   return result.matchedCount === 1;
 }

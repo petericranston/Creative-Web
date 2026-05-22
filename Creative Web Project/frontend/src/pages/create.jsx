@@ -69,7 +69,7 @@ export default function Create() {
   // ── History ──────────────────────────────────────────────────────────────
 
   function pushHistory(currentMarkers, currentPolylines) {
-    setHistory((prev) => [...prev, { markers: currentMarkers, polylines: currentPolylines }]);
+    setHistory((prev) => [...prev, { markers: currentMarkers, polylines: currentPolylines, imageUrl }]);
   }
 
   function undo() {
@@ -77,6 +77,7 @@ export default function Create() {
     const last = history[history.length - 1];
     setMarkers(last.markers);
     setPolylines(last.polylines);
+    setImageUrl(last.imageUrl);
     setHistory((prev) => prev.slice(0, -1));
     setIsDirty(true);
   }
@@ -132,7 +133,7 @@ export default function Create() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mapID, markers, polylines }),
+        body: JSON.stringify({ mapID, markers, polylines, imageUrl }),
       });
       if (!response.ok) { setSaveStatus("error"); return; }
       setSaveStatus("saved");
@@ -367,7 +368,11 @@ export default function Create() {
       body: formData,
     });
     const data = await res.json();
-    if (data.success) setImageUrl(data.imageUrl);
+    if (data.success) {
+      pushHistory(markers, polylines);
+      setImageUrl(data.imageUrl);
+      setIsDirty(true);
+    }
     e.target.value = "";
   }
 
@@ -411,6 +416,7 @@ export default function Create() {
 
           {/* ── Left panel ── */}
           <div id="map-edit-buttons">
+            <div className="marker-btn-wrapper">
             <button
               className={`create-buttons ${showMarkerPopup ? "active-map" : ""}`}
               onClick={() => setShowMarkerPopup((p) => !p)}
@@ -452,6 +458,7 @@ export default function Create() {
                 </button>
               </div>
             )}
+            </div>
 
             <button
               className="create-buttons"

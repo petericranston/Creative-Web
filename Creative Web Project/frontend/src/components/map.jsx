@@ -67,20 +67,28 @@ function MapController({ onRightClick, drawingMode, onFreehandStart, onFreehandM
   return null;
 }
 
+const CAPITAL_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 -36 64 72" width="64" height="80"><ellipse cx="0" cy="30" rx="22" ry="3" fill="#000" opacity="0.25"/><path d="M -22 28 L -22 6 L -16 6 L -16 0 L -10 0 L -10 6 L -4 6 L -4 -6 L 4 -6 L 4 6 L 10 6 L 10 0 L 16 0 L 16 6 L 22 6 L 22 28 Z" fill="#f1e3c2" stroke="#2a1c0a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -22 6 L -20 6 L -20 3 L -17 3 L -17 6 M -13 6 L -13 3 L -10 3 L -10 6 M -4 -6 L -2 -6 L -2 -9 L 2 -9 L 2 -6 L 4 -6 M 10 6 L 10 3 L 13 3 L 13 6 M 17 6 L 17 3 L 20 3 L 20 6" fill="none" stroke="#2a1c0a" stroke-width="1"/><path d="M -2 28 L -2 18 Q 0 14 2 18 L 2 28 Z" fill="#2a1c0a" opacity="0.85"/><rect x="-1.5" y="-2" width="3" height="4" fill="#2a1c0a" opacity="0.85"/><rect x="-14" y="10" width="2" height="3" fill="#2a1c0a" opacity="0.85"/><rect x="12" y="10" width="2" height="3" fill="#2a1c0a" opacity="0.85"/><line x1="0" y1="-9" x2="0" y2="-22" stroke="#2a1c0a" stroke-width="1.2"/><path d="M 0 -22 L 10 -19 L 0 -16 Z" fill="#8a1818" stroke="#2a1c0a" stroke-width="0.8"/></svg>`;
+
+const TOWN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -24 44 48" width="44" height="54"><ellipse cx="0" cy="20" rx="14" ry="2" fill="#000" opacity="0.22"/><path d="M -14 18 L -14 4 L 14 4 L 14 18 Z" fill="#f1e3c2" stroke="#2a1c0a" stroke-width="1.2" stroke-linejoin="round"/><path d="M -14 4 L -12 4 L -12 1 L -9 1 L -9 4 M -5 4 L -5 1 L -2 1 L -2 4 M 2 4 L 2 1 L 5 1 L 5 4 M 9 4 L 9 1 L 12 1 L 12 4" fill="none" stroke="#2a1c0a" stroke-width="0.9"/><path d="M -5 4 L -5 -10 L 5 -10 L 5 4 Z" fill="#f1e3c2" stroke="#2a1c0a" stroke-width="1.2" stroke-linejoin="round"/><path d="M -5 -10 L -3 -10 L -3 -13 L 3 -13 L 3 -10 L 5 -10" fill="none" stroke="#2a1c0a" stroke-width="0.9"/><rect x="-1.5" y="-5" width="3" height="4" fill="#2a1c0a" opacity="0.85"/><path d="M -2 18 L -2 12 Q 0 10 2 12 L 2 18 Z" fill="#2a1c0a" opacity="0.85"/></svg>`;
+
+const HUT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-13 -13 26 26" width="26" height="26"><ellipse cx="0" cy="9" rx="8" ry="1.5" fill="#000" opacity="0.2"/><path d="M -7 8 L -7 -1 L 0 -7 L 7 -1 L 7 8 Z" fill="#f1e3c2" stroke="#2a1c0a" stroke-width="1.1" stroke-linejoin="round"/><rect x="-1.5" y="3" width="3" height="5" fill="#2a1c0a" opacity="0.85"/></svg>`;
+
+// ax/ay = iconAnchor (geographic point pixel within icon)
+// ttOffset = tooltip vertical offset to clear the top of the marker
 const ICON_CONFIGS = {
-  Capital:          { size: 50, cls: "marker-capital", symbol: "★" },
-  LargeSettlement:  { size: 36, cls: "marker-large",   symbol: "◆" },
-  SmallSettlement:  { size: 22, cls: "marker-small",   symbol: "●" },
+  Capital:         { svg: CAPITAL_SVG, w: 64, h: 80, ax: 32, ay: 68, ttOffset: -55 },
+  LargeSettlement: { svg: TOWN_SVG,    w: 44, h: 54, ax: 22, ay: 45, ttOffset: -36 },
+  SmallSettlement: { svg: HUT_SVG,     w: 26, h: 26, ax: 13, ay: 21, ttOffset: -20 },
 };
 
 function getIcon(type, isSelected) {
   const cfg = ICON_CONFIGS[type] ?? ICON_CONFIGS.SmallSettlement;
   const sel = isSelected ? " marker-selected" : "";
   return new L.DivIcon({
-    html: `<div class="${cfg.cls}${sel}" draggable="false">${cfg.symbol}</div>`,
-    iconSize:     [cfg.size, cfg.size],
-    iconAnchor:   [cfg.size / 2, cfg.size / 2],
-    popupAnchor:  [0, -(cfg.size / 2) - 6],
+    html: `<div class="marker-svg-wrapper${sel}" draggable="false">${cfg.svg}</div>`,
+    iconSize:    [cfg.w, cfg.h],
+    iconAnchor:  [cfg.ax, cfg.ay],
+    popupAnchor: [0, -(cfg.ay)],
     className: "",
   });
 }
@@ -126,31 +134,34 @@ export default function Map({
         />
         <ImageOverlay url={mapImage} bounds={bounds} />
 
-        {data.map((marker, index) => (
-          <Marker
-            key={marker.clientID ?? marker._id ?? index}
-            position={marker.coords}
-            icon={getIcon(marker.type, marker.clientID === selectedMarker)}
-            draggable={!!onMarkerMove}
-            eventHandlers={{
-              click: () => onSelectMarker && onSelectMarker(marker.clientID),
-              dblclick: (e) => {
-                L.DomEvent.stopPropagation(e);
-                if (onMarkerEdit) onMarkerEdit(marker.clientID);
-              },
-              dragend: (e) => {
-                if (!onMarkerMove) return;
-                const { lat, lng } = e.target.getLatLng();
-                onMarkerMove(marker.clientID, [lat, lng]);
-              },
-            }}
-          >
-            <Tooltip permanent direction="top" offset={[0, -30]} className="marker-label">
-              {marker.popUp}
-            </Tooltip>
-            <Popup>{marker.popUp}</Popup>
-          </Marker>
-        ))}
+        {data.map((marker, index) => {
+          const cfg = ICON_CONFIGS[marker.type] ?? ICON_CONFIGS.SmallSettlement;
+          return (
+            <Marker
+              key={marker.clientID ?? marker._id ?? index}
+              position={marker.coords}
+              icon={getIcon(marker.type, marker.clientID === selectedMarker)}
+              draggable={!!onMarkerMove}
+              eventHandlers={{
+                click: () => onSelectMarker && onSelectMarker(marker.clientID),
+                dblclick: (e) => {
+                  L.DomEvent.stopPropagation(e);
+                  if (onMarkerEdit) onMarkerEdit(marker.clientID);
+                },
+                dragend: (e) => {
+                  if (!onMarkerMove) return;
+                  const { lat, lng } = e.target.getLatLng();
+                  onMarkerMove(marker.clientID, [lat, lng]);
+                },
+              }}
+            >
+              <Tooltip permanent direction="top" offset={[0, cfg.ttOffset]} className="marker-label">
+                {marker.popUp}
+              </Tooltip>
+              <Popup>{marker.popUp}</Popup>
+            </Marker>
+          );
+        })}
 
         {polylines.map((line, index) => {
           const isSelected = selectedPolyline === index;
@@ -190,16 +201,29 @@ export default function Map({
       <div className="map-legend">
         <h4>Legend</h4>
         <div className="legend-item">
-          <div className="marker-capital legend-marker">★</div>
-          <span>Capital</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 -36 64 72" width="22" height="28" className="legend-svg">
+            <path d="M -22 28 L -22 6 L -16 6 L -16 0 L -10 0 L -10 6 L -4 6 L -4 -6 L 4 -6 L 4 6 L 10 6 L 10 0 L 16 0 L 16 6 L 22 6 L 22 28 Z" fill="#f1e3c2" stroke="#2a1c0a" strokeWidth="1.4" strokeLinejoin="round"/>
+            <path d="M -22 6 L -20 6 L -20 3 L -17 3 L -17 6 M -13 6 L -13 3 L -10 3 L -10 6 M -4 -6 L -2 -6 L -2 -9 L 2 -9 L 2 -6 L 4 -6 M 10 6 L 10 3 L 13 3 L 13 6 M 17 6 L 17 3 L 20 3 L 20 6" fill="none" stroke="#2a1c0a" strokeWidth="1"/>
+            <line x1="0" y1="-9" x2="0" y2="-22" stroke="#2a1c0a" strokeWidth="1.2"/>
+            <path d="M 0 -22 L 10 -19 L 0 -16 Z" fill="#8a1818" stroke="#2a1c0a" strokeWidth="0.8"/>
+          </svg>
+          <span>Castle</span>
         </div>
         <div className="legend-item">
-          <div className="marker-large legend-marker">◆</div>
-          <span>Large Settlement</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -24 44 48" width="18" height="22" className="legend-svg">
+            <path d="M -14 18 L -14 4 L 14 4 L 14 18 Z" fill="#f1e3c2" stroke="#2a1c0a" strokeWidth="1.2" strokeLinejoin="round"/>
+            <path d="M -14 4 L -12 4 L -12 1 L -9 1 L -9 4 M -5 4 L -5 1 L -2 1 L -2 4 M 2 4 L 2 1 L 5 1 L 5 4 M 9 4 L 9 1 L 12 1 L 12 4" fill="none" stroke="#2a1c0a" strokeWidth="0.9"/>
+            <path d="M -5 4 L -5 -10 L 5 -10 L 5 4 Z" fill="#f1e3c2" stroke="#2a1c0a" strokeWidth="1.2" strokeLinejoin="round"/>
+            <path d="M -5 -10 L -3 -10 L -3 -13 L 3 -13 L 3 -10 L 5 -10" fill="none" stroke="#2a1c0a" strokeWidth="0.9"/>
+          </svg>
+          <span>Town</span>
         </div>
         <div className="legend-item">
-          <div className="marker-small legend-marker">●</div>
-          <span>Small Settlement</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="-13 -13 26 26" width="16" height="16" className="legend-svg">
+            <path d="M -7 8 L -7 -1 L 0 -7 L 7 -1 L 7 8 Z" fill="#f1e3c2" stroke="#2a1c0a" strokeWidth="1.1" strokeLinejoin="round"/>
+            <rect x="-1.5" y="3" width="3" height="5" fill="#2a1c0a" opacity="0.85"/>
+          </svg>
+          <span>Hut</span>
         </div>
         <div className="legend-item">
           <div className="legend-line" />
