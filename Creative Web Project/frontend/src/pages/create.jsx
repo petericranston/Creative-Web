@@ -164,6 +164,7 @@ export default function Create() {
       <header>
         <h1>Create a map</h1>
       </header>
+
       <main>
         <div id="map-edits">
           <div id="map-edit-buttons">
@@ -174,6 +175,7 @@ export default function Create() {
             >
               Capital
             </button>
+
             {capitalInputVisible && (
               <input
                 type="text"

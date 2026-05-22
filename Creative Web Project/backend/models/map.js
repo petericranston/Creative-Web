@@ -42,7 +42,7 @@ async function saveChanges(id, markers) {
   const result = await mapData.updateOne(
     //Updates the map the new array of markers
     { _id: id },
-    { $set: { markers: markers } }
+    { $set: { markers: markers } },
   );
   console.log(result);
 }
@@ -51,7 +51,7 @@ async function publishMap(id) {
   //Changes the map ispublished variable to true
   const result = await mapData.updateOne(
     { _id: id },
-    { $set: { isPublished: true } }
+    { $set: { isPublished: true } },
   );
 }
 
