@@ -1,18 +1,401 @@
 .create-buttons {
-  margin: 20px;
-  padding: 20px;
-  width: 120px;
-  height: 100px;
+  margin: 6px 0;
+  padding: 12px 10px;
+  width: 130px;
+  min-height: 52px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 #map-edits {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: center;
   width: 100%;
+  gap: 0;
 }
 
 #map-edit-buttons {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  padding: 16px 12px;
+  border-right: 1px solid #3a2e1a;
+  min-width: 158px;
+  background: #0f0d08;
+}
+
+#map-edit-buttons input {
+  width: 130px;
+  margin: 4px 0 8px;
+}
+
+#user-map-list {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 14px;
+  border-left: 1px solid #3a2e1a;
+  min-width: 190px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: #0f0d08;
+}
+
+#user-map-list h2 {
+  font-size: 1em;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #3a2e1a;
+}
+
+#user-map-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.map-list-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.map-name-btn {
+  flex: 1;
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 0.75em;
+}
+
+.map-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  padding: 4px 6px;
+  font-size: 0.7em;
+  min-height: unset;
+  width: auto;
+  color: #7a6a50;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.icon-btn:hover {
+  color: #c9a84c;
+  border-color: #5a4a30;
+  background: #1a1208;
+}
+
+.delete-btn:hover {
+  color: #c0392b;
+  border-color: #6b1010;
+  background: #1a0808;
+}
+
+.rename-input {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 0.75em;
+}
+
+.map-owner {
+  font-size: 0.85em;
+  color: #7a6a50;
+  font-style: italic;
+  font-family: 'Crimson Pro', serif;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.active-map {
+  border-color: #c9a84c;
+  color: #f0c86a;
+  background: #221a08;
+}
+
+.published-badge {
+  color: #6dbb73;
+  font-size: 0.6em;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.unsaved-warning {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.8em;
+  color: #c9a84c;
+  margin: 6px 0 0;
+  text-align: center;
+}
+
+.is-published {
+  border-color: #4a7c4e;
+  color: #6dbb73;
+}
+
+.status-btn.unpublished {
+  border-color: #5a4a30;
+  color: #b09070;
+}
+
+.description-input {
+  width: 130px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  background-color: #16120a;
+  border: 1px solid #5a4a30;
+  color: #e8d5b0;
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.85em;
+  border-radius: 4px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.description-input:focus {
+  border-color: #c9a84c;
+}
+
+.description-input::placeholder {
+  color: #6a5840;
+  font-style: italic;
+}
+
+.map-description {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.9em;
+  color: #b09070;
+  border-left: 2px solid #3a2e1a;
+  padding: 6px 10px;
+  margin: 8px 0;
+}
+
+.empty-msg {
+  color: #6a5840;
+  font-style: italic;
+  font-size: 0.9em;
+  font-family: 'Crimson Pro', serif;
+  padding: 4px 0;
+}
+
+#user-map-list li button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 0.75em;
+}
+
+#user-map-list input {
+  width: 100%;
+  margin: 6px 0;
+}
+
+/* ── Tablet ── */
+@media (max-width: 900px) {
+  #map-edit-buttons {
+    min-width: 120px;
+    padding: 12px 8px;
+  }
+
+  .create-buttons {
+    width: 108px;
+    font-size: 0.7em;
+    padding: 10px 6px;
+  }
+
+  #user-map-list {
+    min-width: 150px;
+    padding: 12px 10px;
+  }
+}
+
+/* ── Create marker popup ── */
+.marker-popup {
+  width: 130px;
+  background: #13100a;
+  border: 1px solid #3a2e1a;
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.marker-popup input {
+  width: 100%;
+  margin: 2px 0;
+}
+
+.marker-type-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  width: 100%;
+  text-align: left;
+  background: #1a1610;
+  border: 1px solid #3a2e1a;
+  border-radius: 4px;
+  color: #c8b89a;
+  cursor: pointer;
+  font-size: 0.78rem;
+  letter-spacing: 0;
+  text-transform: none;
+  font-family: 'Crimson Pro', serif;
+  min-height: unset;
+  box-shadow: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.marker-type-btn:hover {
+  background: #221a0c;
+  border-color: #5a4a30;
+  color: #e8d5b0;
+}
+
+.marker-type-btn.type-selected {
+  border-color: #c9a84c;
+  background: #2a1f08;
+  color: #f0c86a;
+}
+
+/* ── Right-click context menu ── */
+.map-context-menu {
+  position: fixed;
+  background: rgba(13, 11, 8, 0.96);
+  border: 1px solid #5a4a30;
+  border-radius: 4px;
+  z-index: 3000;
+  overflow: hidden;
+  min-width: 160px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+.map-context-menu button {
+  display: block;
+  width: 100%;
+  padding: 9px 14px;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 0;
+  color: #e8d5b0;
+  cursor: pointer;
+  font-size: 0.85rem;
+  letter-spacing: 0;
+  text-transform: none;
+  font-family: 'Crimson Pro', serif;
+  min-height: unset;
+  box-shadow: none;
+}
+
+.map-context-menu button:hover {
+  background: rgba(90, 74, 48, 0.4);
+  color: #f0c86a;
+}
+
+.map-context-menu button.cancel-option {
+  color: #7a6a50;
+  border-top: 1px solid #3a2e1a;
+}
+
+/* ── Edit marker name dialog ── */
+.edit-marker-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-marker-dialog {
+  background: #1a1610;
+  border: 1px solid #5a4a30;
+  border-radius: 6px;
+  padding: 18px 22px;
+  min-width: 260px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+}
+
+.edit-marker-dialog h4 {
+  margin: 0 0 12px;
+  color: #c9a84c;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+}
+
+.edit-marker-dialog input {
+  width: 100%;
+  margin-bottom: 14px;
+  box-sizing: border-box;
+}
+
+.dialog-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.dialog-buttons button {
+  padding: 7px 16px;
+  min-height: unset;
+  font-size: 0.8rem;
+}
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+  #map-edits {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #map-edit-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #3a2e1a;
+    min-width: unset;
+    padding: 10px 8px;
+    gap: 6px;
+  }
+
+  #map-edit-buttons input {
+    width: 100%;
+    margin: 4px 6px;
+  }
+
+  .create-buttons {
+    width: auto;
+    min-width: 90px;
+    padding: 8px 10px;
+    min-height: 40px;
+    font-size: 0.7em;
+    margin: 0;
+  }
+
+  #user-map-list {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #3a2e1a;
+    max-height: 40vh;
+    min-width: unset;
+  }
 }

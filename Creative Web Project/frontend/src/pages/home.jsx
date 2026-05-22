@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import Map from "../components/map";
+import { getStoredUser, clearStoredUser } from "../auth";
 import "../styles/homepage.css";
 
 export default function Home() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(getStoredUser());
 
   const [markers, setMarkers] = useState([
     //Creating a array of markers to be sent through the component
@@ -32,10 +33,13 @@ export default function Home() {
   useEffect(() => {
     //Checking if the user is logged in to be used on the home page to change some text
     async function getUser() {
-      const response = await fetch("/api/user");
+      const response = await fetch("/api/user", { credentials: "include" });
       const data = await response.json();
       if (data.loggedIn) {
         setUser(data.username);
+      } else {
+        setUser(null);
+        clearStoredUser();
       }
     }
     getUser();
@@ -48,7 +52,7 @@ export default function Home() {
       </header>
       <main>
         {user ? <h2>Welcome, {user}</h2> : <h2>You're not logged in</h2>}
-        <h3>Log in to create your own world!</h3>
+        {!user && <h3>Log in to create your own world!</h3>}
         <h3>Or explore other users worlds!</h3>
       </main>
       <Map data={markers} />

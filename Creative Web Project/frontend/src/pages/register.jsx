@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { storeUser } from "../auth";
 
 export default function Register() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ username: "", password: "" }); //Variables to store user data
+  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  //Handles data sent through the fields the user writes in
   function handleUsername(e) {
     setFormData((prev) => ({ ...prev, username: e.target.value }));
   }
@@ -14,8 +16,9 @@ export default function Register() {
   }
 
   async function submit(e) {
-    //Sends user data through
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
       const response = await fetch("/api/register", {
@@ -23,19 +26,24 @@ export default function Register() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+
+      const data = await response.json();
+
       if (!response.ok) {
-        console.log("Registration Failed");
+        setError(data.message || "Registration failed. Please try again.");
         return;
       }
 
-      const data = await response.json();
+      storeUser(formData.username);
       setFormData({ username: "", password: "" });
       navigate("/");
-      console.log("User Registered");
-    } catch (error) {
-      console.log("Registration Failed: ", error);
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
+
   return (
     <div>
       <header>
@@ -57,7 +65,10 @@ export default function Register() {
             value={formData.password}
             onChange={handlePassword}
           />
-          <button type="submit">Register</button>
+          {error && <p className="form-error">{error}</p>}
+          <button type="submit" disabled={loading}>
+            {loading ? "Registering..." : "Register"}
+          </button>
         </form>
       </main>
     </div>

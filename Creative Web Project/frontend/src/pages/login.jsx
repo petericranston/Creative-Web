@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { storeUser } from "../auth";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ username: "", password: "" }); //Variable to store user data
+  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  //Handles the data the user sent in through the fields
   function handleUsername(e) {
     setFormData((prev) => ({ ...prev, username: e.target.value }));
   }
@@ -14,8 +16,9 @@ export default function Login() {
   }
 
   async function submit(e) {
-    //Sends data through
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
       const response = await fetch("/api/login", {
@@ -23,19 +26,22 @@ export default function Login() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+
       if (!response.ok) {
-        console.log("Login Failed");
+        setError("Incorrect username or password.");
         return;
       }
 
-      const data = await response.json();
+      storeUser(formData.username);
       setFormData({ username: "", password: "" });
       navigate("/");
-      console.log("User Logged In");
-    } catch (error) {
-      console.log("Login Failed: ", error);
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
+
   return (
     <div>
       <header>
@@ -57,7 +63,10 @@ export default function Login() {
             value={formData.password}
             onChange={handlePassword}
           />
-          <button type="submit">Login</button>
+          {error && <p className="form-error">{error}</p>}
+          <button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
       </main>
     </div>

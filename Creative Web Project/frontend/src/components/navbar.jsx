@@ -1,49 +1,51 @@
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getStoredUser, clearStoredUser } from "../auth";
 import "../styles/navbar.css";
-import { useLocation } from "react-router-dom";
 
 export default function Navbar() {
   const location = useLocation();
-
   const navigate = useNavigate();
-  const logout = async () => {
-    //Logout function
-    try {
-      const response = await fetch("/api/logout", {
-        method: "POST",
-        credentials: "include",
+
+  // Initialise instantly from localStorage — no flicker on refresh
+  const [loggedIn, setLoggedIn] = useState(!!getStoredUser());
+
+  useEffect(() => {
+    // Verify with the server in the background and sync if out of date
+    fetch("/api/user", { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => {
+        setLoggedIn(data.loggedIn);
+        if (!data.loggedIn) clearStoredUser();
       });
+  }, [location.pathname]);
+
+  const logout = async () => {
+    try {
+      await fetch("/api/logout", { method: "POST", credentials: "include" });
+      clearStoredUser();
       if (window.location.pathname === "/") {
-        window.location.reload(); //Reloading page if the user is already on the home page
+        window.location.reload();
       } else {
-        navigate("/"); //Sending user to home page if they aren't already on it
+        navigate("/");
       }
-    } catch (error) {
+    } catch {
       console.log("Error logging out");
     }
   };
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    //Checking if the user is logged in, so that i can make the create link visible or not
-    fetch("/api/user", { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => setLoggedIn(data.loggedIn));
-  }, [location.pathname]);
 
   return (
-    //Nav buttons
     <nav>
-      <Link to="/">Home</Link> | <Link to="/login">Login</Link> |{" "}
-      <Link to="/register">Register</Link> |{" "}
-      {loggedIn && <Link to="/create">Create</Link>} {loggedIn && "|"}{" "}
-      <Link to="/viewOthers">View Others' Maps</Link> |{" "}
-      <button id="logoutBtn" onClick={logout}>
-        Logout
-      </button>
+      <Link to="/">Home</Link>
+      <span>|</span>
+      <Link to="/login">Login</Link>
+      <span>|</span>
+      <Link to="/register">Register</Link>
+      <span>|</span>
+      {loggedIn && <><Link to="/create">Create</Link><span>|</span></>}
+      <Link to="/viewOthers">View Others' Maps</Link>
+      <span>|</span>
+      <button id="logoutBtn" onClick={logout}>Logout</button>
     </nav>
   );
 }
