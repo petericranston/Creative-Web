@@ -24,6 +24,19 @@
   text-align: center;
 }
 
+.home-map-wrapper {
+  width: min(90vh, 88vw);
+  height: calc(100vh - var(--header-h) - var(--nav-h) - 160px);
+  min-height: 300px;
+}
+
+@media (max-width: 768px) {
+  .home-map-wrapper {
+    width: 96vw;
+    height: calc(100vh - var(--header-h) - var(--nav-h) - 180px);
+  }
+}
+
 @media (max-width: 600px) {
   #home-page main h2 {
     font-size: 1em;

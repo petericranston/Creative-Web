@@ -1,5 +1,5 @@
 import "../styles/map.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ImageOverlay,
   MapContainer,
@@ -13,10 +13,14 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-function MapController({ onRightClick, drawingMode, onFreehandStart, onFreehandMove, onFreehandEnd, onClearSelection }) {
+function MapController({ onRightClick, drawingMode, onFreehandStart, onFreehandMove, onFreehandEnd, onClearSelection, bounds }) {
   const map = useMap();
   const isPointerDown = useRef(false);
   const lastPoint = useRef(null);
+
+  useEffect(() => {
+    map.fitBounds(bounds, { padding: [0, 0], animate: false });
+  }, [map, bounds]);
 
   useEffect(() => {
     if (!drawingMode) {
@@ -81,9 +85,19 @@ const ICON_CONFIGS = {
   SmallSettlement: { svg: HUT_SVG,     w: 26, h: 26, ax: 13, ay: 21, ttOffset: -20 },
 };
 
-function getIcon(type, isSelected) {
-  const cfg = ICON_CONFIGS[type] ?? ICON_CONFIGS.SmallSettlement;
+function getIcon(type, isSelected, customMarkerTypes) {
   const sel = isSelected ? " marker-selected" : "";
+  const customType = customMarkerTypes?.find(ct => ct.id === type);
+  if (customType) {
+    return new L.DivIcon({
+      html: `<div class="marker-svg-wrapper${sel}" draggable="false"><img src="${customType.imageUrl}" class="custom-marker-img" draggable="false" /></div>`,
+      iconSize:    [32, 32],
+      iconAnchor:  [16, 32],
+      popupAnchor: [0, -32],
+      className: "",
+    });
+  }
+  const cfg = ICON_CONFIGS[type] ?? ICON_CONFIGS.SmallSettlement;
   return new L.DivIcon({
     html: `<div class="marker-svg-wrapper${sel}" draggable="false">${cfg.svg}</div>`,
     iconSize:    [cfg.w, cfg.h],
@@ -111,18 +125,29 @@ export default function Map({
   onFreehandMove,
   onFreehandEnd,
   currentDrawPath = [],
+  customMarkerTypes = [],
+  showLabels = true,
+  bgColor = "#111d22",
+  interactive = true,
 }) {
+  const [legendOpen, setLegendOpen] = useState(true);
   const bounds = [[0, 0], [1150, 950]];
   const mapImage = imageUrl || "/images/BlankMap.png";
 
   return (
-    <div id="map-wrapper">
+    <div id="map-wrapper" style={{ "--map-bg": bgColor }}>
       <MapContainer
         crs={L.CRS.Simple}
         bounds={bounds}
         maxBounds={bounds}
         maxBoundsViscosity={1.0}
         id="map-container"
+        dragging={interactive}
+        scrollWheelZoom={interactive}
+        doubleClickZoom={interactive}
+        touchZoom={interactive}
+        zoomControl={interactive}
+        keyboard={interactive}
       >
         <MapController
           onRightClick={onRightClick}
@@ -131,16 +156,18 @@ export default function Map({
           onFreehandStart={onFreehandStart}
           onFreehandMove={onFreehandMove}
           onFreehandEnd={onFreehandEnd}
+          bounds={bounds}
         />
         <ImageOverlay url={mapImage} bounds={bounds} />
 
         {data.map((marker, index) => {
-          const cfg = ICON_CONFIGS[marker.type] ?? ICON_CONFIGS.SmallSettlement;
+          const isCustom = customMarkerTypes.some(ct => ct.id === marker.type);
+          const cfg = isCustom ? { ttOffset: -28 } : (ICON_CONFIGS[marker.type] ?? ICON_CONFIGS.SmallSettlement);
           return (
             <Marker
               key={marker.clientID ?? marker._id ?? index}
               position={marker.coords}
-              icon={getIcon(marker.type, marker.clientID === selectedMarker)}
+              icon={getIcon(marker.type, marker.clientID === selectedMarker, customMarkerTypes)}
               draggable={!!onMarkerMove}
               eventHandlers={{
                 click: () => onSelectMarker && onSelectMarker(marker.clientID),
@@ -155,9 +182,11 @@ export default function Map({
                 },
               }}
             >
-              <Tooltip permanent direction="top" offset={[0, cfg.ttOffset]} className="marker-label">
-                {marker.popUp}
-              </Tooltip>
+              {showLabels && (
+                <Tooltip permanent direction="top" offset={[0, cfg.ttOffset]} className="marker-label">
+                  {marker.popUp}
+                </Tooltip>
+              )}
               <Popup>{marker.popUp}</Popup>
             </Marker>
           );
@@ -199,36 +228,49 @@ export default function Map({
       </MapContainer>
 
       <div className="map-legend">
-        <h4>Legend</h4>
-        <div className="legend-item">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 -36 64 72" width="22" height="28" className="legend-svg">
-            <path d="M -22 28 L -22 6 L -16 6 L -16 0 L -10 0 L -10 6 L -4 6 L -4 -6 L 4 -6 L 4 6 L 10 6 L 10 0 L 16 0 L 16 6 L 22 6 L 22 28 Z" fill="#f1e3c2" stroke="#2a1c0a" strokeWidth="1.4" strokeLinejoin="round"/>
-            <path d="M -22 6 L -20 6 L -20 3 L -17 3 L -17 6 M -13 6 L -13 3 L -10 3 L -10 6 M -4 -6 L -2 -6 L -2 -9 L 2 -9 L 2 -6 L 4 -6 M 10 6 L 10 3 L 13 3 L 13 6 M 17 6 L 17 3 L 20 3 L 20 6" fill="none" stroke="#2a1c0a" strokeWidth="1"/>
-            <line x1="0" y1="-9" x2="0" y2="-22" stroke="#2a1c0a" strokeWidth="1.2"/>
-            <path d="M 0 -22 L 10 -19 L 0 -16 Z" fill="#8a1818" stroke="#2a1c0a" strokeWidth="0.8"/>
-          </svg>
-          <span>Castle</span>
-        </div>
-        <div className="legend-item">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -24 44 48" width="18" height="22" className="legend-svg">
-            <path d="M -14 18 L -14 4 L 14 4 L 14 18 Z" fill="#f1e3c2" stroke="#2a1c0a" strokeWidth="1.2" strokeLinejoin="round"/>
-            <path d="M -14 4 L -12 4 L -12 1 L -9 1 L -9 4 M -5 4 L -5 1 L -2 1 L -2 4 M 2 4 L 2 1 L 5 1 L 5 4 M 9 4 L 9 1 L 12 1 L 12 4" fill="none" stroke="#2a1c0a" strokeWidth="0.9"/>
-            <path d="M -5 4 L -5 -10 L 5 -10 L 5 4 Z" fill="#f1e3c2" stroke="#2a1c0a" strokeWidth="1.2" strokeLinejoin="round"/>
-            <path d="M -5 -10 L -3 -10 L -3 -13 L 3 -13 L 3 -10 L 5 -10" fill="none" stroke="#2a1c0a" strokeWidth="0.9"/>
-          </svg>
-          <span>Town</span>
-        </div>
-        <div className="legend-item">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="-13 -13 26 26" width="16" height="16" className="legend-svg">
-            <path d="M -7 8 L -7 -1 L 0 -7 L 7 -1 L 7 8 Z" fill="#f1e3c2" stroke="#2a1c0a" strokeWidth="1.1" strokeLinejoin="round"/>
-            <rect x="-1.5" y="3" width="3" height="5" fill="#2a1c0a" opacity="0.85"/>
-          </svg>
-          <span>Hut</span>
-        </div>
-        <div className="legend-item">
-          <div className="legend-line" />
-          <span>Path / Road</span>
-        </div>
+        <button className="legend-toggle" onClick={() => setLegendOpen(p => !p)}>
+          <h4>Legend</h4>
+          <span className="legend-chevron">{legendOpen ? "▾" : "▸"}</span>
+        </button>
+        {legendOpen && (
+          <>
+            <div className="legend-item">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 -36 64 72" width="22" height="28" className="legend-svg">
+                <path d="M -22 28 L -22 6 L -16 6 L -16 0 L -10 0 L -10 6 L -4 6 L -4 -6 L 4 -6 L 4 6 L 10 6 L 10 0 L 16 0 L 16 6 L 22 6 L 22 28 Z" fill="#f1e3c2" stroke="#2a1c0a" strokeWidth="1.4" strokeLinejoin="round"/>
+                <path d="M -22 6 L -20 6 L -20 3 L -17 3 L -17 6 M -13 6 L -13 3 L -10 3 L -10 6 M -4 -6 L -2 -6 L -2 -9 L 2 -9 L 2 -6 L 4 -6 M 10 6 L 10 3 L 13 3 L 13 6 M 17 6 L 17 3 L 20 3 L 20 6" fill="none" stroke="#2a1c0a" strokeWidth="1"/>
+                <line x1="0" y1="-9" x2="0" y2="-22" stroke="#2a1c0a" strokeWidth="1.2"/>
+                <path d="M 0 -22 L 10 -19 L 0 -16 Z" fill="#8a1818" stroke="#2a1c0a" strokeWidth="0.8"/>
+              </svg>
+              <span>Castle</span>
+            </div>
+            <div className="legend-item">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -24 44 48" width="18" height="22" className="legend-svg">
+                <path d="M -14 18 L -14 4 L 14 4 L 14 18 Z" fill="#f1e3c2" stroke="#2a1c0a" strokeWidth="1.2" strokeLinejoin="round"/>
+                <path d="M -14 4 L -12 4 L -12 1 L -9 1 L -9 4 M -5 4 L -5 1 L -2 1 L -2 4 M 2 4 L 2 1 L 5 1 L 5 4 M 9 4 L 9 1 L 12 1 L 12 4" fill="none" stroke="#2a1c0a" strokeWidth="0.9"/>
+                <path d="M -5 4 L -5 -10 L 5 -10 L 5 4 Z" fill="#f1e3c2" stroke="#2a1c0a" strokeWidth="1.2" strokeLinejoin="round"/>
+                <path d="M -5 -10 L -3 -10 L -3 -13 L 3 -13 L 3 -10 L 5 -10" fill="none" stroke="#2a1c0a" strokeWidth="0.9"/>
+              </svg>
+              <span>Town</span>
+            </div>
+            <div className="legend-item">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="-13 -13 26 26" width="16" height="16" className="legend-svg">
+                <path d="M -7 8 L -7 -1 L 0 -7 L 7 -1 L 7 8 Z" fill="#f1e3c2" stroke="#2a1c0a" strokeWidth="1.1" strokeLinejoin="round"/>
+                <rect x="-1.5" y="3" width="3" height="5" fill="#2a1c0a" opacity="0.85"/>
+              </svg>
+              <span>Hut</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-line" />
+              <span>Path / Road</span>
+            </div>
+            {customMarkerTypes.map(ct => (
+              <div key={ct.id} className="legend-item">
+                <img src={ct.imageUrl} alt={ct.name} />
+                <span>{ct.name}</span>
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

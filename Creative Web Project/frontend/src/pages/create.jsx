@@ -10,6 +10,7 @@ export default function Create() {
   const [mapID, setMapID] = useState();
   const [isDirty, setIsDirty] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
+  const [bgColor, setBgColor] = useState("#111d22");
 
   // New map input
   const [nameInputVisible, setNameInputVisible] = useState(false);
@@ -19,6 +20,12 @@ export default function Create() {
   const [showMarkerPopup, setShowMarkerPopup] = useState(false);
   const [markerType, setMarkerType] = useState(null);
   const [markerName, setMarkerName] = useState("");
+
+  // Custom marker types
+  const [customMarkerTypes, setCustomMarkerTypes] = useState([]);
+  const [showCustomTypeForm, setShowCustomTypeForm] = useState(false);
+  const [customTypeName, setCustomTypeName] = useState("");
+  const [pendingIconUrl, setPendingIconUrl] = useState("");
 
   // Map list / metadata
   const [maps, setMaps] = useState([]);
@@ -36,6 +43,9 @@ export default function Create() {
   const [currentDrawPath, setCurrentDrawPath] = useState([]);
   const [pathLabel, setPathLabel] = useState("");
 
+  // Label visibility toggle
+  const [showLabels, setShowLabels] = useState(true);
+
   // Right-click context menu
   const [contextMenu, setContextMenu] = useState(null);
 
@@ -44,6 +54,7 @@ export default function Create() {
   const [editingPolyline, setEditingPolyline] = useState(null);
 
   const fileInputRef = useRef(null);
+  const customIconInputRef = useRef(null);
   const drawingRef = useRef([]);
 
   const currentMap = maps.find((m) => m._id === mapID);
@@ -106,6 +117,8 @@ export default function Create() {
       setMarkers([]);
       setPolylines([]);
       setImageUrl("");
+      setBgColor("#111d22");
+      setCustomMarkerTypes([]);
       setHistory([]);
       setMapName("");
       setIsDirty(false);
@@ -141,6 +154,8 @@ export default function Create() {
     );
     setPolylines(data.polylines ?? []);
     setImageUrl(data.imageUrl ?? "");
+    setBgColor(data.bgColor ?? "#111d22");
+    setCustomMarkerTypes(data.customMarkerTypes ?? []);
   }
 
   async function saveChanges() {
@@ -150,7 +165,7 @@ export default function Create() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mapID, markers, polylines, imageUrl }),
+        body: JSON.stringify({ mapID, markers, polylines, imageUrl, customMarkerTypes, bgColor }),
       });
       if (!response.ok) {
         setSaveStatus("error");
@@ -203,6 +218,8 @@ export default function Create() {
         setMarkers([]);
         setPolylines([]);
         setImageUrl("");
+        setBgColor("#111d22");
+        setCustomMarkerTypes([]);
         setIsDirty(false);
         setHistory([]);
       }
@@ -335,17 +352,19 @@ export default function Create() {
   }
 
   function placeMarkerAt(type) {
-    const defaultNames = {
+    const builtinDefaults = {
       Capital: "Capital",
       LargeSettlement: "Large Settlement",
       SmallSettlement: "Small Settlement",
     };
+    const customType = customMarkerTypes.find(ct => ct.id === type);
+    const defaultName = builtinDefaults[type] ?? customType?.name ?? "Marker";
     pushHistory(markers, polylines);
     setMarkers((prev) => [
       ...prev,
       {
         coords: [contextMenu.latlng.lat, contextMenu.latlng.lng],
-        popUp: defaultNames[type],
+        popUp: defaultName,
         type,
         clientID: crypto.randomUUID(),
       },
@@ -418,15 +437,49 @@ export default function Create() {
 
   function createMarker() {
     if (!markerType) return;
-    const defaults = {
+    const builtinDefaults = {
       Capital: "Capital",
       LargeSettlement: "Large Settlement",
       SmallSettlement: "Small Settlement",
     };
-    NewMarker(markerType, markerName.trim() || defaults[markerType]);
+    const customType = customMarkerTypes.find(ct => ct.id === markerType);
+    const defaultName = builtinDefaults[markerType] ?? customType?.name ?? "Marker";
+    NewMarker(markerType, markerName.trim() || defaultName);
     setMarkerName("");
     setMarkerType(null);
     setShowMarkerPopup(false);
+  }
+
+  async function handleCustomIconUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("image", file);
+    const res = await fetch("/api/uploadMarkerIcon", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
+    const data = await res.json();
+    if (data.success) setPendingIconUrl(data.imageUrl);
+    e.target.value = "";
+  }
+
+  function addCustomType() {
+    const name = customTypeName.trim();
+    if (!name || !pendingIconUrl) return;
+    const newType = { id: crypto.randomUUID(), name, imageUrl: pendingIconUrl };
+    setCustomMarkerTypes(prev => [...prev, newType]);
+    setCustomTypeName("");
+    setPendingIconUrl("");
+    setShowCustomTypeForm(false);
+    setIsDirty(true);
+  }
+
+  function deleteCustomType(id) {
+    setCustomMarkerTypes(prev => prev.filter(ct => ct.id !== id));
+    if (markerType === id) setMarkerType(null);
+    setIsDirty(true);
   }
 
   // ── Key handlers ──────────────────────────────────────────────────────────
@@ -465,137 +518,151 @@ export default function Create() {
         <h1>Create a map</h1>
       </header>
 
-      <main>
+      <main style={{ paddingTop: 0 }}>
         <div id="map-edits">
           {/* ── Left panel ── */}
           <div id="map-edit-buttons">
-            <div className="marker-btn-wrapper">
+
+            {/* ── Editing tools ── */}
+            <div className="panel-section">
+              <p className="panel-section-label">Editing</p>
+
+              <div className="marker-btn-wrapper">
+                <button
+                  className={`create-buttons ${showMarkerPopup ? "active-map" : ""}`}
+                  onClick={() => setShowMarkerPopup((p) => !p)}
+                  disabled={!mapID}
+                >
+                  Create Marker
+                </button>
+
+                {showMarkerPopup && (
+                  <div
+                    className="marker-popup"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {[
+                      { type: "Capital", symbol: "★", label: "Capital", color: "#e8c84a" },
+                      { type: "LargeSettlement", symbol: "◆", label: "Large Settlement", color: "#b07828" },
+                      { type: "SmallSettlement", symbol: "●", label: "Small Settlement", color: "#7a6028" },
+                    ].map(({ type, symbol, label, color }) => (
+                      <button
+                        key={type}
+                        className={`marker-type-btn ${markerType === type ? "type-selected" : ""}`}
+                        onClick={() => setMarkerType(type)}
+                      >
+                        <span style={{ color, fontSize: "13px" }}>{symbol}</span>
+                        {label}
+                      </button>
+                    ))}
+
+                    {customMarkerTypes.map(ct => (
+                      <button
+                        key={ct.id}
+                        className={`marker-type-btn ${markerType === ct.id ? "type-selected" : ""}`}
+                        onClick={() => setMarkerType(ct.id)}
+                      >
+                        <img src={ct.imageUrl} alt="" className="custom-marker-thumb" />
+                        {ct.name}
+                      </button>
+                    ))}
+
+                    <div className="custom-type-divider" />
+
+                    <input
+                      type="text"
+                      value={markerName}
+                      onChange={(e) => setMarkerName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") createMarker();
+                        if (e.key === "Escape") setShowMarkerPopup(false);
+                      }}
+                      placeholder="Name (optional)"
+                    />
+                    <button
+                      className="create-buttons status-btn saved"
+                      onClick={createMarker}
+                      disabled={!markerType}
+                      style={{ width: "100%", margin: 0 }}
+                    >
+                      Add
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <button
-                className={`create-buttons ${showMarkerPopup ? "active-map" : ""}`}
-                onClick={() => setShowMarkerPopup((p) => !p)}
+                className={`create-buttons ${drawingMode ? "active-map" : ""}`}
+                onClick={toggleDrawing}
                 disabled={!mapID}
               >
-                Create Marker
+                {drawingMode ? "Drawing..." : "Draw Path"}
               </button>
 
-              {showMarkerPopup && (
-                <div
-                  className="marker-popup"
-                  onClick={(e) => e.stopPropagation()}
+              {drawingMode && (
+                <input
+                  type="text"
+                  value={pathLabel}
+                  onChange={(e) => setPathLabel(e.target.value)}
+                  placeholder="Path name (opt.)"
+                  style={{ width: 130 }}
+                />
+              )}
+
+              <button
+                className="create-buttons"
+                onClick={undo}
+                disabled={history.length === 0}
+              >
+                Undo
+              </button>
+
+              {(selectedMarker || selectedPolyline !== null) && (
+                <button
+                  className="create-buttons btn-danger"
+                  onClick={deleteSelected}
                 >
-                  {[
-                    {
-                      type: "Capital",
-                      symbol: "★",
-                      label: "Capital",
-                      color: "#e8c84a",
-                    },
-                    {
-                      type: "LargeSettlement",
-                      symbol: "◆",
-                      label: "Large Settlement",
-                      color: "#b07828",
-                    },
-                    {
-                      type: "SmallSettlement",
-                      symbol: "●",
-                      label: "Small Settlement",
-                      color: "#7a6028",
-                    },
-                  ].map(({ type, symbol, label, color }) => (
-                    <button
-                      key={type}
-                      className={`marker-type-btn ${markerType === type ? "type-selected" : ""}`}
-                      onClick={() => setMarkerType(type)}
-                    >
-                      <span style={{ color, fontSize: "13px" }}>{symbol}</span>
-                      {label}
-                    </button>
-                  ))}
-                  <input
-                    type="text"
-                    value={markerName}
-                    onChange={(e) => setMarkerName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") createMarker();
-                      if (e.key === "Escape") setShowMarkerPopup(false);
-                    }}
-                    placeholder="Name (optional)"
-                  />
-                  <button
-                    className="create-buttons status-btn saved"
-                    onClick={createMarker}
-                    disabled={!markerType}
-                    style={{ width: "100%", margin: 0 }}
-                  >
-                    Add
-                  </button>
-                </div>
+                  {selectedPolyline !== null ? "Delete Path" : "Delete Marker"}
+                </button>
               )}
             </div>
 
-            <button
-              className="create-buttons"
-              onClick={deleteSelected}
-              disabled={!selectedMarker && selectedPolyline === null}
-            >
-              {selectedPolyline !== null ? "Delete Path" : "Delete Marker"}
-            </button>
+            {/* ── Map actions ── */}
+            <div className="panel-section">
+              <p className="panel-section-label">Map</p>
 
-            <button
-              className={`create-buttons ${drawingMode ? "is-published" : ""}`}
-              onClick={toggleDrawing}
-              disabled={!mapID}
-            >
-              {drawingMode ? "Drawing..." : "Draw Path"}
-            </button>
+              <button
+                className={`create-buttons btn-primary status-btn ${saveStatus}`}
+                onClick={saveChanges}
+                disabled={saveStatus === "saving" || !mapID}
+              >
+                {saveLabel}
+              </button>
 
-            {drawingMode && (
-              <input
-                type="text"
-                value={pathLabel}
-                onChange={(e) => setPathLabel(e.target.value)}
-                placeholder="Path name (opt.)"
-                style={{ width: 130 }}
-              />
-            )}
+              <button
+                className={`create-buttons status-btn ${publishStatus} ${isPublished ? "is-published" : ""}`}
+                onClick={togglePublish}
+                disabled={publishStatus === "saving" || !mapID}
+              >
+                {publishLabel}
+              </button>
 
-            <button
-              className="create-buttons"
-              onClick={undo}
-              disabled={history.length === 0}
-            >
-              Undo
-            </button>
+              {isDirty && <p className="unsaved-warning">Unsaved changes</p>}
+            </div>
 
-            <button
-              className={`create-buttons status-btn ${saveStatus}`}
-              onClick={saveChanges}
-              disabled={saveStatus === "saving" || !mapID}
-            >
-              {saveLabel}
-            </button>
-
-            <button
-              className={`create-buttons status-btn ${publishStatus} ${isPublished ? "is-published" : ""}`}
-              onClick={togglePublish}
-              disabled={publishStatus === "saving" || !mapID}
-            >
-              {publishLabel}
-            </button>
-
-            {isDirty && <p className="unsaved-warning">Unsaved changes</p>}
-
+            {/* ── Settings ── */}
             {mapID && (
-              <>
-                <textarea
-                  className="description-input"
-                  placeholder="Map description..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  onBlur={(e) => saveDescription(e.target.value)}
-                  rows={3}
-                />
+              <div className="panel-section">
+                <p className="panel-section-label">Settings</p>
+
+                <button
+                  className={`create-buttons ${showLabels ? "active-map" : ""}`}
+                  onClick={() => setShowLabels(p => !p)}
+                  title="Toggle marker name labels on the map"
+                >
+                  {showLabels ? "Labels On" : "Labels Off"}
+                </button>
+
                 <button
                   className="create-buttons"
                   onClick={() => fileInputRef.current?.click()}
@@ -610,7 +677,92 @@ export default function Create() {
                   style={{ display: "none" }}
                   onChange={handleImageUpload}
                 />
-              </>
+
+                <div className="bg-color-row">
+                  <label className="bg-color-label" htmlFor="bgColorPicker">
+                    Background Colour
+                  </label>
+                  <input
+                    id="bgColorPicker"
+                    type="color"
+                    value={bgColor}
+                    onChange={(e) => { setBgColor(e.target.value); setIsDirty(true); }}
+                    className="bg-color-input"
+                    title="Map background colour"
+                  />
+                </div>
+
+                <div className="marker-types-section">
+                  <p className="marker-types-label">Marker Types</p>
+
+                  {customMarkerTypes.length > 0 && (
+                    <ul className="custom-type-list">
+                      {customMarkerTypes.map(ct => (
+                        <li key={ct.id} className="custom-type-item">
+                          <img src={ct.imageUrl} alt="" className="custom-marker-thumb" />
+                          <span className="custom-type-name">{ct.name}</span>
+                          <button
+                            className="icon-btn delete-btn"
+                            title={`Delete ${ct.name}`}
+                            onClick={() => deleteCustomType(ct.id)}
+                          >
+                            ✕
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  <button
+                    className={`create-buttons ${showCustomTypeForm ? "active-map" : ""}`}
+                    onClick={() => {
+                      setShowCustomTypeForm(p => !p);
+                      setPendingIconUrl("");
+                      setCustomTypeName("");
+                    }}
+                  >
+                    {showCustomTypeForm ? "Cancel" : "+ Add Type"}
+                  </button>
+
+                  {showCustomTypeForm && (
+                    <div className="custom-type-form">
+                      <div
+                        className="custom-type-upload-area"
+                        onClick={() => customIconInputRef.current?.click()}
+                        title="Click to upload an icon image"
+                      >
+                        {pendingIconUrl
+                          ? <img src={pendingIconUrl} alt="preview" />
+                          : <span>Click to upload icon</span>
+                        }
+                      </div>
+                      <input
+                        ref={customIconInputRef}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={handleCustomIconUpload}
+                      />
+                      <input
+                        type="text"
+                        value={customTypeName}
+                        onChange={(e) => setCustomTypeName(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") addCustomType(); }}
+                        placeholder="Type name"
+                        style={{ width: "100%", margin: 0 }}
+                      />
+                      <button
+                        className="create-buttons status-btn saved"
+                        onClick={addCustomType}
+                        disabled={!pendingIconUrl || !customTypeName.trim()}
+                        style={{ width: "100%", margin: 0 }}
+                      >
+                        Create
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
           </div>
 
@@ -633,6 +785,9 @@ export default function Create() {
             onFreehandMove={handleFreehandMove}
             onFreehandEnd={handleFreehandEnd}
             currentDrawPath={currentDrawPath}
+            customMarkerTypes={customMarkerTypes}
+            showLabels={showLabels}
+            bgColor={bgColor}
           />
 
           {/* ── Right panel ── */}
@@ -651,6 +806,16 @@ export default function Create() {
                 onKeyDown={handleNewMapKeyDown}
                 placeholder="Enter Map Name"
                 autoFocus
+              />
+            )}
+            {mapID && (
+              <textarea
+                className="description-input"
+                placeholder="Map description..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                onBlur={(e) => saveDescription(e.target.value)}
+                rows={3}
               />
             )}
             <h2>Your Maps:</h2>
@@ -720,6 +885,11 @@ export default function Create() {
           <button onClick={() => placeMarkerAt("SmallSettlement")}>
             + Small Settlement
           </button>
+          {customMarkerTypes.map(ct => (
+            <button key={ct.id} onClick={() => placeMarkerAt(ct.id)}>
+              + {ct.name}
+            </button>
+          ))}
           <button
             className="cancel-option"
             onClick={() => setContextMenu(null)}

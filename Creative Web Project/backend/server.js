@@ -101,13 +101,25 @@ app.post("/api/saveChanges", async (request, response) => {
   if (!request.session.username) {
     return response.status(401).json({ success: false, message: "Not logged in" });
   }
-  const { mapID, markers, polylines = [], imageUrl } = request.body;
+  const { mapID, markers, polylines = [], imageUrl, customMarkerTypes = [], bgColor } = request.body;
   const cleanedMarkers = markers.map(({ coords, popUp, type }) => ({ coords, popUp, type }));
   const cleanedPolylines = polylines.map(({ points, color, label }) => ({ points, color: color || "#8b0000", label: label || "" }));
-  const success = await mapModel.saveChanges(mapID, request.session.username, cleanedMarkers, cleanedPolylines, imageUrl);
+  const cleanedCustomTypes = customMarkerTypes.map(({ id, name, imageUrl: url }) => ({ id, name, imageUrl: url }));
+  const success = await mapModel.saveChanges(mapID, request.session.username, cleanedMarkers, cleanedPolylines, imageUrl, cleanedCustomTypes, bgColor);
   success
     ? response.json({ success: true })
     : response.status(403).json({ success: false, message: "Not authorised" });
+});
+
+app.post("/api/uploadMarkerIcon", upload.single("image"), async (request, response) => {
+  if (!request.session.username) {
+    return response.status(401).json({ success: false });
+  }
+  if (!request.file) {
+    return response.status(400).json({ success: false, message: "No file uploaded" });
+  }
+  const imageUrl = `/uploads/${request.file.filename}`;
+  response.json({ success: true, imageUrl });
 });
 
 app.post("/api/uploadImage", upload.single("image"), async (request, response) => {

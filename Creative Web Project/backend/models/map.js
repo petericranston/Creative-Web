@@ -9,12 +9,20 @@ const polylineSchema = new Schema({
   label: { type: String, default: "" },
 });
 
+const customMarkerTypeSchema = new Schema({
+  id: String,
+  name: String,
+  imageUrl: String,
+});
+
 const mapSchema = new Schema({
   mapName: String,
   description: { type: String, default: "" },
   markers: [markerSchema],
   polylines: { type: [polylineSchema], default: [] },
   imageUrl: { type: String, default: "" },
+  customMarkerTypes: { type: [customMarkerTypeSchema], default: [] },
+  bgColor: { type: String, default: "#111d22" },
   owner: String,
   isPublished: Boolean,
 });
@@ -36,9 +44,11 @@ async function newMap(markers, mapName, username) {
   }
 }
 
-async function saveChanges(id, username, markers, polylines, imageUrl) {
+async function saveChanges(id, username, markers, polylines, imageUrl, customMarkerTypes, bgColor) {
   const update = { markers, polylines };
   if (imageUrl !== undefined) update.imageUrl = imageUrl;
+  if (customMarkerTypes !== undefined) update.customMarkerTypes = customMarkerTypes;
+  if (bgColor !== undefined) update.bgColor = bgColor;
   const result = await mapData.updateOne(
     { _id: id, owner: username },
     { $set: update },
@@ -87,11 +97,13 @@ async function sendAllMaps() {
 }
 
 async function sendMarkers(id) {
-  const map = await mapData.findById(id).select("markers polylines imageUrl").lean();
+  const map = await mapData.findById(id).select("markers polylines imageUrl customMarkerTypes bgColor").lean();
   return {
     markers: map.markers,
     polylines: map.polylines ?? [],
     imageUrl: map.imageUrl ?? "",
+    customMarkerTypes: map.customMarkerTypes ?? [],
+    bgColor: map.bgColor ?? "#111d22",
   };
 }
 

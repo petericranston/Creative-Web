@@ -6,6 +6,7 @@ export default function ViewOthers() {
   const [markers, setMarkers] = useState([]);
   const [polylines, setPolylines] = useState([]);
   const [imageUrl, setImageUrl] = useState("");
+  const [bgColor, setBgColor] = useState("#111d22");
   const [maps, setMaps] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [search, setSearch] = useState("");
@@ -32,6 +33,7 @@ export default function ViewOthers() {
     setMarkers((data.markers ?? []).map((m) => ({ ...m, clientID: crypto.randomUUID() })));
     setPolylines(data.polylines ?? []);
     setImageUrl(data.imageUrl ?? "");
+    setBgColor(data.bgColor ?? "#111d22");
   }
 
   const publishedMaps = maps.filter((m) => m.isPublished);
@@ -67,7 +69,7 @@ export default function ViewOthers() {
       </header>
       <main>
         <div id="map-edits">
-          <Map data={markers} polylines={polylines} imageUrl={imageUrl} />
+          <Map data={markers} polylines={polylines} imageUrl={imageUrl} bgColor={bgColor} />
           <div id="user-map-list">
             <input
               type="text"

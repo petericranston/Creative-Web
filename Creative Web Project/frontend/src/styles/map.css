@@ -12,8 +12,9 @@
 
 #map-wrapper {
   position: relative;
-  height: calc(100vh - var(--header-h) - var(--nav-h) - 160px);
-  width: min(90vh, 88vw);
+  flex: 1;
+  min-width: 0;
+  height: 100%;
   min-height: 300px;
 }
 
@@ -28,6 +29,10 @@
     0 0 48px rgba(201, 168, 76, 0.08);
 }
 
+.leaflet-container {
+  background: var(--map-bg, #111d22) !important;
+}
+
 /* ── Legend ── */
 .map-legend {
   position: absolute;
@@ -39,16 +44,41 @@
   border-radius: 4px;
   padding: 8px 12px;
   color: #e8d5b0;
-  pointer-events: none;
+  pointer-events: all;
+}
+
+.legend-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0 0 2px;
+  cursor: pointer;
+  box-shadow: none;
+  min-height: unset;
+  pointer-events: all;
+}
+
+.legend-toggle:hover h4 {
+  color: #e0c070;
 }
 
 .map-legend h4 {
-  margin: 0 0 6px;
+  margin: 0;
   font-family: 'Cinzel', serif;
   font-size: 0.72rem;
   color: #c9a84c;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.legend-chevron {
+  font-size: 0.65rem;
+  color: #7a6a50;
+  margin-left: 6px;
 }
 
 .legend-item {
@@ -75,6 +105,15 @@
   height: 2px;
   background: #8b0000;
   flex-shrink: 0;
+}
+
+/* ── Custom uploaded marker icons ── */
+.custom-marker-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  display: block;
+  -webkit-user-drag: none;
 }
 
 /* ── Custom map markers ── */
@@ -113,6 +152,7 @@
 
 @media (max-width: 768px) {
   #map-wrapper {
+    flex: none;
     width: 96vw;
     height: calc(100vh - var(--header-h) - var(--nav-h) - 180px);
   }

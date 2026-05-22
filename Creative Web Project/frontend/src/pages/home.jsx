@@ -110,7 +110,9 @@ export default function Home() {
         )}
         <h3>Create a map or explore other users worlds!</h3>
       </main>
-      <Map data={markers} />
+      <div className="home-map-wrapper">
+        <Map data={markers} interactive={false} />
+      </div>
 
       {showAuth && (
         <div className="auth-overlay" onClick={closeAuth}>
