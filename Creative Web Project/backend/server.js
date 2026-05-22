@@ -127,7 +127,7 @@ app.post("/api/saveChanges", async (request, response) => {
 
   console.log(mapID);
   console.log(markers);
-  mapModel.saveChanges(mapID, cleanedMarkers); //Saves the markers to the map with that id
+  await mapModel.saveChanges(mapID, cleanedMarkers); //Saves the markers to the map with that id
   response.json({ success: true });
 });
 
