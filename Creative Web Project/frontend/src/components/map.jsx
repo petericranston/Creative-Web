@@ -94,7 +94,6 @@ export default function Map({
   selectedMarker = null,
   imageUrl,
   onMarkerMove,
-  onMarkerDragStart,
   onSelectMarker,
   onMarkerEdit,
   onRightClick,
@@ -139,7 +138,6 @@ export default function Map({
                 L.DomEvent.stopPropagation(e);
                 if (onMarkerEdit) onMarkerEdit(marker.clientID);
               },
-              dragstart: () => onMarkerDragStart && onMarkerDragStart(),
               dragend: (e) => {
                 if (!onMarkerMove) return;
                 const { lat, lng } = e.target.getLatLng();

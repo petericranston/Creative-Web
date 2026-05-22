@@ -251,11 +251,8 @@ export default function Create() {
     setSelectedPolyline(null);
   }
 
-  function onMarkerDragStart() {
-    pushHistory(markers, polylines);
-  }
-
   function onMarkerMove(clientID, newCoords) {
+    pushHistory(markers, polylines);
     setMarkers((prev) =>
       prev.map((m) => m.clientID === clientID ? { ...m, coords: newCoords } : m),
     );
@@ -547,7 +544,6 @@ export default function Create() {
             imageUrl={imageUrl}
             onSelectMarker={handleSelectMarker}
             onMarkerMove={onMarkerMove}
-            onMarkerDragStart={onMarkerDragStart}
             onMarkerEdit={handleMarkerEdit}
             onRightClick={handleRightClick}
             onClearSelection={clearSelection}
