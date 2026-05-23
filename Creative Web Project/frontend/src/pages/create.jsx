@@ -476,10 +476,19 @@ export default function Create() {
     setIsDirty(true);
   }
 
-  function deleteCustomType(id) {
-    setCustomMarkerTypes(prev => prev.filter(ct => ct.id !== id));
+  async function deleteCustomType(id) {
+    const ct = customMarkerTypes.find(c => c.id === id);
+    setCustomMarkerTypes(prev => prev.filter(c => c.id !== id));
     if (markerType === id) setMarkerType(null);
     setIsDirty(true);
+    if (ct?.imageUrl) {
+      await fetch("/api/deleteMarkerIcon", {
+        method: "DELETE",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageUrl: ct.imageUrl }),
+      });
+    }
   }
 
   // ── Key handlers ──────────────────────────────────────────────────────────

@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const path = require("path");
+const fs = require("fs");
 const multer = require("multer");
 const dotenv = require("dotenv").config();
 
@@ -120,6 +121,24 @@ app.post("/api/uploadMarkerIcon", upload.single("image"), async (request, respon
   }
   const imageUrl = `/uploads/${request.file.filename}`;
   response.json({ success: true, imageUrl });
+});
+
+app.delete("/api/deleteMarkerIcon", async (request, response) => {
+  if (!request.session.username) {
+    return response.status(401).json({ success: false });
+  }
+  const { imageUrl } = request.body;
+  if (!imageUrl || !imageUrl.startsWith("/uploads/")) {
+    return response.status(400).json({ success: false, message: "Invalid image URL" });
+  }
+  const filename = path.basename(imageUrl);
+  const filePath = path.join(__dirname, "uploads", filename);
+  try {
+    fs.unlinkSync(filePath);
+  } catch {
+    // File already gone — treat as success
+  }
+  response.json({ success: true });
 });
 
 app.post("/api/uploadImage", upload.single("image"), async (request, response) => {
