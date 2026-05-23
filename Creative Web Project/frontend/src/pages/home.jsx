@@ -120,6 +120,7 @@ export default function Home() {
                 onClick={() => navigate("/create")}
               >
                 My Maps
+              </button>
               <button
                 className="btn-hero-secondary"
                 onClick={() => navigate("/viewOthers")}
