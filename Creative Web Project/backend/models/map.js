@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const markerSchema = new Schema({ coords: Array, popUp: String, type: String });
+const markerSchema = new Schema({ coords: Array, popUp: String, type: String, size: { type: Number, default: 1 } });
 
 const polylineSchema = new Schema({
   points: Array,

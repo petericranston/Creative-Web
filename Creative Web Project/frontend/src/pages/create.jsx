@@ -26,6 +26,7 @@ export default function Create() {
   const [showCustomTypeForm, setShowCustomTypeForm] = useState(false);
   const [customTypeName, setCustomTypeName] = useState("");
   const [pendingIconUrl, setPendingIconUrl] = useState("");
+  const [iconUploadError, setIconUploadError] = useState("");
 
   // Map list / metadata
   const [maps, setMaps] = useState([]);
@@ -306,18 +307,18 @@ export default function Create() {
     setIsDirty(true);
   }
 
-  // Double-click to edit marker name
+  // Double-click to edit marker name / size
   function handleMarkerEdit(clientID) {
     const marker = markers.find((m) => m.clientID === clientID);
-    if (marker) setEditingMarker({ clientID, name: marker.popUp });
+    if (marker) setEditingMarker({ clientID, name: marker.popUp, size: marker.size ?? 1 });
   }
 
-  function saveEditedMarkerName() {
+  function saveEditedMarker() {
     if (!editingMarker) return;
     setMarkers((prev) =>
       prev.map((m) =>
         m.clientID === editingMarker.clientID
-          ? { ...m, popUp: editingMarker.name }
+          ? { ...m, popUp: editingMarker.name, size: editingMarker.size }
           : m,
       ),
     );
@@ -453,15 +454,30 @@ export default function Create() {
   async function handleCustomIconUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
+    setIconUploadError("");
     const formData = new FormData();
     formData.append("image", file);
-    const res = await fetch("/api/uploadMarkerIcon", {
-      method: "POST",
-      credentials: "include",
-      body: formData,
-    });
-    const data = await res.json();
-    if (data.success) setPendingIconUrl(data.imageUrl);
+    try {
+      const res = await fetch("/api/uploadMarkerIcon", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setIconUploadError(data.message || `Upload failed (${res.status})`);
+        e.target.value = "";
+        return;
+      }
+      const data = await res.json();
+      if (data.success) {
+        setPendingIconUrl(data.imageUrl);
+      } else {
+        setIconUploadError("Upload failed. Please try again.");
+      }
+    } catch {
+      setIconUploadError("Network error. Please try again.");
+    }
     e.target.value = "";
   }
 
@@ -728,6 +744,7 @@ export default function Create() {
                       setShowCustomTypeForm(p => !p);
                       setPendingIconUrl("");
                       setCustomTypeName("");
+                      setIconUploadError("");
                     }}
                   >
                     {showCustomTypeForm ? "Cancel" : "+ Add Type"}
@@ -745,6 +762,9 @@ export default function Create() {
                           : <span>Click to upload icon</span>
                         }
                       </div>
+                      {iconUploadError && (
+                        <p className="form-error" style={{ margin: "4px 0 0" }}>{iconUploadError}</p>
+                      )}
                       <input
                         ref={customIconInputRef}
                         type="file"
@@ -908,7 +928,7 @@ export default function Create() {
         </div>
       )}
 
-      {/* ── Edit marker name dialog ── */}
+      {/* ── Edit marker dialog ── */}
       {editingMarker && (
         <div
           className="edit-marker-overlay"
@@ -918,23 +938,39 @@ export default function Create() {
             className="edit-marker-dialog"
             onClick={(e) => e.stopPropagation()}
           >
-            <h4>Rename Marker</h4>
+            <h4>Edit Marker</h4>
             <input
               value={editingMarker.name}
               onChange={(e) =>
                 setEditingMarker((prev) => ({ ...prev, name: e.target.value }))
               }
               onKeyDown={(e) => {
-                if (e.key === "Enter") saveEditedMarkerName();
+                if (e.key === "Enter") saveEditedMarker();
                 if (e.key === "Escape") setEditingMarker(null);
               }}
               autoFocus
             />
+            <div className="marker-size-row">
+              <label className="marker-size-label">
+                Size: {Math.round(editingMarker.size * 100)}%
+              </label>
+              <input
+                type="range"
+                min="0.5"
+                max="2.5"
+                step="0.1"
+                value={editingMarker.size}
+                onChange={(e) =>
+                  setEditingMarker((prev) => ({ ...prev, size: parseFloat(e.target.value) }))
+                }
+                className="marker-size-slider"
+              />
+            </div>
             <div className="dialog-buttons">
               <button onClick={() => setEditingMarker(null)}>Cancel</button>
               <button
                 className="status-btn saved"
-                onClick={saveEditedMarkerName}
+                onClick={saveEditedMarker}
               >
                 Save
               </button>

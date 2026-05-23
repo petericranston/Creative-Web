@@ -46,9 +46,7 @@ export default function Navbar() {
       <span>|</span>
       {loggedIn && <><Link to="/create">Create</Link><span>|</span></>}
       <Link to="/viewOthers">View Others' Maps</Link>
-      <span>|</span>
-      {!loggedIn && <><Link to="/?auth=login">Login / Register</Link><span>|</span></>}
-      <button id="logoutBtn" onClick={logout}>Logout</button>
+      {loggedIn && <><span>|</span><button id="logoutBtn" onClick={logout}>Logout</button></>}
     </nav>
   );
 }

@@ -85,24 +85,29 @@ const ICON_CONFIGS = {
   SmallSettlement: { svg: HUT_SVG,     w: 26, h: 26, ax: 13, ay: 21, ttOffset: -20 },
 };
 
-function getIcon(type, isSelected, customMarkerTypes) {
+function getIcon(type, isSelected, customMarkerTypes, size = 1) {
   const sel = isSelected ? " marker-selected" : "";
   const customType = customMarkerTypes?.find(ct => ct.id === type);
   if (customType) {
+    const s = Math.round(32 * size);
     return new L.DivIcon({
-      html: `<div class="marker-svg-wrapper${sel}" draggable="false"><img src="${customType.imageUrl}" class="custom-marker-img" draggable="false" /></div>`,
-      iconSize:    [32, 32],
-      iconAnchor:  [16, 32],
-      popupAnchor: [0, -32],
+      html: `<div class="marker-svg-wrapper${sel}" draggable="false"><img src="${customType.imageUrl}" class="custom-marker-img" draggable="false" style="width:${s}px;height:${s}px" /></div>`,
+      iconSize:    [s, s],
+      iconAnchor:  [s / 2, s],
+      popupAnchor: [0, -s],
       className: "",
     });
   }
   const cfg = ICON_CONFIGS[type] ?? ICON_CONFIGS.SmallSettlement;
+  const w = Math.round(cfg.w * size), h = Math.round(cfg.h * size);
+  const ax = Math.round(cfg.ax * size), ay = Math.round(cfg.ay * size);
+  // Set width/height inline on the SVG element — CSS alone can't reliably override SVG presentation attributes
+  const scaledSvg = cfg.svg.replace('<svg ', `<svg style="width:${w}px;height:${h}px;" `);
   return new L.DivIcon({
-    html: `<div class="marker-svg-wrapper${sel}" draggable="false">${cfg.svg}</div>`,
-    iconSize:    [cfg.w, cfg.h],
-    iconAnchor:  [cfg.ax, cfg.ay],
-    popupAnchor: [0, -(cfg.ay)],
+    html: `<div class="marker-svg-wrapper${sel}" draggable="false">${scaledSvg}</div>`,
+    iconSize:    [w, h],
+    iconAnchor:  [ax, ay],
+    popupAnchor: [0, -ay],
     className: "",
   });
 }
@@ -161,13 +166,16 @@ export default function Map({
         <ImageOverlay url={mapImage} bounds={bounds} />
 
         {data.map((marker, index) => {
+          const markerSize = marker.size ?? 1;
           const isCustom = customMarkerTypes.some(ct => ct.id === marker.type);
-          const cfg = isCustom ? { ttOffset: -28 } : (ICON_CONFIGS[marker.type] ?? ICON_CONFIGS.SmallSettlement);
+          const baseCfg = isCustom ? { ay: 32 } : (ICON_CONFIGS[marker.type] ?? ICON_CONFIGS.SmallSettlement);
+          // Keep a fixed 6px gap above the icon top regardless of scale
+          const ttOffset = -(Math.round(baseCfg.ay * markerSize) + 6);
           return (
             <Marker
               key={marker.clientID ?? marker._id ?? index}
               position={marker.coords}
-              icon={getIcon(marker.type, marker.clientID === selectedMarker, customMarkerTypes)}
+              icon={getIcon(marker.type, marker.clientID === selectedMarker, customMarkerTypes, markerSize)}
               draggable={!!onMarkerMove}
               eventHandlers={{
                 click: () => onSelectMarker && onSelectMarker(marker.clientID),
@@ -183,7 +191,7 @@ export default function Map({
               }}
             >
               {showLabels && (
-                <Tooltip permanent direction="top" offset={[0, cfg.ttOffset]} className="marker-label">
+                <Tooltip permanent direction="top" offset={[0, ttOffset]} className="marker-label">
                   {marker.popUp}
                 </Tooltip>
               )}

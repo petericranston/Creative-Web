@@ -588,10 +588,28 @@
   font-size: 0.9rem;
 }
 
-.edit-marker-dialog input {
+.edit-marker-dialog input[type="text"] {
   width: 100%;
   margin-bottom: 14px;
   box-sizing: border-box;
+}
+
+.marker-size-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.marker-size-label {
+  font-size: 0.78rem;
+  color: #a08a5a;
+}
+
+.marker-size-slider {
+  width: 100%;
+  accent-color: #c9a84c;
+  cursor: pointer;
 }
 
 .dialog-buttons {

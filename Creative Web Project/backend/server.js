@@ -103,7 +103,7 @@ app.post("/api/saveChanges", async (request, response) => {
     return response.status(401).json({ success: false, message: "Not logged in" });
   }
   const { mapID, markers, polylines = [], imageUrl, customMarkerTypes = [], bgColor } = request.body;
-  const cleanedMarkers = markers.map(({ coords, popUp, type }) => ({ coords, popUp, type }));
+  const cleanedMarkers = markers.map(({ coords, popUp, type, size }) => ({ coords, popUp, type, size: size ?? 1 }));
   const cleanedPolylines = polylines.map(({ points, color, label }) => ({ points, color: color || "#8b0000", label: label || "" }));
   const cleanedCustomTypes = customMarkerTypes.map(({ id, name, imageUrl: url }) => ({ id, name, imageUrl: url }));
   const success = await mapModel.saveChanges(mapID, request.session.username, cleanedMarkers, cleanedPolylines, imageUrl, cleanedCustomTypes, bgColor);
@@ -112,10 +112,12 @@ app.post("/api/saveChanges", async (request, response) => {
     : response.status(403).json({ success: false, message: "Not authorised" });
 });
 
-app.post("/api/uploadMarkerIcon", upload.single("image"), async (request, response) => {
+app.post("/api/uploadMarkerIcon", (request, response, next) => {
   if (!request.session.username) {
     return response.status(401).json({ success: false });
   }
+  next();
+}, upload.single("image"), async (request, response) => {
   if (!request.file) {
     return response.status(400).json({ success: false, message: "No file uploaded" });
   }
@@ -141,10 +143,12 @@ app.delete("/api/deleteMarkerIcon", async (request, response) => {
   response.json({ success: true });
 });
 
-app.post("/api/uploadImage", upload.single("image"), async (request, response) => {
+app.post("/api/uploadImage", (request, response, next) => {
   if (!request.session.username) {
     return response.status(401).json({ success: false });
   }
+  next();
+}, upload.single("image"), async (request, response) => {
   if (!request.file) {
     return response.status(400).json({ success: false, message: "No file uploaded" });
   }
