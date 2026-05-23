@@ -115,13 +115,32 @@ export default function Home() {
         <div className="hero-ctas">
           {user ? (
             <>
-              <button className="btn-hero-primary" onClick={() => navigate("/create")}>My Maps</button>
-              <button className="btn-hero-secondary" onClick={() => navigate("/viewOthers")}>Explore Maps</button>
+              <button
+                className="btn-hero-primary"
+                onClick={() => navigate("/create")}
+              >
+                My Maps
+              <button
+                className="btn-hero-secondary"
+                onClick={() => navigate("/viewOthers")}
+              >
+                Explore Maps
+              </button>
             </>
           ) : (
             <>
-              <button className="btn-hero-primary" onClick={() => openAuth("register")}>Get Started</button>
-              <button className="btn-hero-secondary" onClick={() => openAuth("login")}>Log In</button>
+              <button
+                className="btn-hero-primary"
+                onClick={() => openAuth("register")}
+              >
+                Get Started
+              </button>
+              <button
+                className="btn-hero-secondary"
+                onClick={() => openAuth("login")}
+              >
+                Log In
+              </button>
             </>
           )}
         </div>
@@ -135,11 +154,16 @@ export default function Home() {
       <section className="features">
         <div className="feature-card">
           <h3>Create</h3>
-          <p>Draw custom fantasy maps with markers and paths over your own artwork.</p>
+          <p>
+            Draw custom fantasy maps with markers and paths over your own
+            artwork.
+          </p>
         </div>
         <div className="feature-card">
           <h3>Customise</h3>
-          <p>Name settlements, trace roads, and design your own marker types.</p>
+          <p>
+            Name settlements, trace roads, and design your own marker types.
+          </p>
         </div>
         <div className="feature-card">
           <h3>Share</h3>
@@ -186,7 +210,9 @@ export default function Home() {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, username: e.target.value }))
                 }
-                onKeyDown={(e) => e.key === "Enter" && passwordRef.current?.focus()}
+                onKeyDown={(e) =>
+                  e.key === "Enter" && passwordRef.current?.focus()
+                }
                 autoFocus
               />
               <input
