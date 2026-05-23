@@ -77,6 +77,8 @@ const TOWN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -24 44 48
 
 const HUT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-13 -13 26 26" width="26" height="26"><ellipse cx="0" cy="9" rx="8" ry="1.5" fill="#000" opacity="0.2"/><path d="M -7 8 L -7 -1 L 0 -7 L 7 -1 L 7 8 Z" fill="#f1e3c2" stroke="#2a1c0a" stroke-width="1.1" stroke-linejoin="round"/><rect x="-1.5" y="3" width="3" height="5" fill="#2a1c0a" opacity="0.85"/></svg>`;
 
+const BOUNDS = [[0, 0], [1150, 950]];
+
 // ax/ay = iconAnchor (geographic point pixel within icon)
 // ttOffset = tooltip vertical offset to clear the top of the marker
 const ICON_CONFIGS = {
@@ -136,15 +138,14 @@ export default function Map({
   interactive = true,
 }) {
   const [legendOpen, setLegendOpen] = useState(true);
-  const bounds = [[0, 0], [1150, 950]];
   const mapImage = imageUrl || "/images/BlankMap.png";
 
   return (
     <div id="map-wrapper" style={{ "--map-bg": bgColor }}>
       <MapContainer
         crs={L.CRS.Simple}
-        bounds={bounds}
-        maxBounds={bounds}
+        bounds={BOUNDS}
+        maxBounds={BOUNDS}
         maxBoundsViscosity={1.0}
         id="map-container"
         dragging={interactive}
@@ -161,9 +162,9 @@ export default function Map({
           onFreehandStart={onFreehandStart}
           onFreehandMove={onFreehandMove}
           onFreehandEnd={onFreehandEnd}
-          bounds={bounds}
+          bounds={BOUNDS}
         />
-        <ImageOverlay url={mapImage} bounds={bounds} />
+        <ImageOverlay url={mapImage} bounds={BOUNDS} />
 
         {data.map((marker, index) => {
           const markerSize = marker.size ?? 1;

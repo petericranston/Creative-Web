@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
-const dotenv = require("dotenv").config();
+require("dotenv").config();
 
 const userModel = require("./models/users");
 const mapModel = require("./models/map");
@@ -13,6 +13,10 @@ const app = express();
 
 app.use(express.json());
 
+const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"]);
+
+fs.mkdirSync(path.join(__dirname, "uploads"), { recursive: true });
+
 const multerStorage = multer.diskStorage({
   destination: "uploads/",
   filename: (req, file, cb) => {
@@ -20,7 +24,17 @@ const multerStorage = multer.diskStorage({
     cb(null, unique + path.extname(file.originalname));
   },
 });
-const upload = multer({ storage: multerStorage, limits: { fileSize: 5 * 1024 * 1024 } });
+const upload = multer({
+  storage: multerStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (ALLOWED_MIME.has(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files are allowed"));
+    }
+  },
+});
 
 const sessions = require("express-session");
 
@@ -28,19 +42,28 @@ const mongoDBUsername = process.env.mongoDBUsername;
 const mongoDBPassword = process.env.mongoDBPassword;
 const mongoAppName = process.env.mongoAppName;
 
-const connectionString = `mongodb+srv://${mongoDBUsername}:${mongoDBPassword}@cluster0.hxdji7a.mongodb.net/${mongoAppName}?retryWrites=true&w=majority`;
-mongoose.connect(connectionString);
+const mongoDBCluster = process.env.mongoDBCluster;
+const connectionString = `mongodb+srv://${mongoDBUsername}:${mongoDBPassword}@${mongoDBCluster}/${mongoAppName}?retryWrites=true&w=majority`;
+mongoose.connect(connectionString).catch((err) => {
+  console.error("MongoDB connection failed:", err.message);
+  process.exit(1);
+});
 
 const oneHour = 1 * 60 * 60 * 1000;
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
     credentials: true,
   }),
   sessions({
     secret: process.env.sessionSecret,
-    cookie: { maxAge: oneHour },
+    cookie: {
+      maxAge: oneHour,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    },
     resave: false,
     saveUninitialized: false,
   }),
@@ -48,26 +71,27 @@ app.use(
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.use((request, response, next) => {
-  response.locals.username = request.session.username || null;
-  response.locals.admin = request.session.admin || null;
-  next();
-});
-
 app.post("/api/register", async (request, response) => {
-  const success = await userModel.registerUser(request.body.username, request.body.password);
+  const username = request.body.username?.trim();
+  const { password } = request.body;
+  if (!username || username.length > 32) {
+    return response.status(400).json({ success: false, message: "Username must be between 1 and 32 characters" });
+  }
+  if (!password || password.length < 8) {
+    return response.status(400).json({ success: false, message: "Password must be at least 8 characters" });
+  }
+  const success = await userModel.registerUser(username, password);
   if (!success) {
     return response.status(409).json({ success: false, message: "Username already taken" });
   }
-  request.session.username = request.body.username;
-  response.json({ success: true });
+  request.session.username = username;
+  response.json({ success: true, username });
 });
 
 app.post("/api/login", async (request, response) => {
   const user = await userModel.checkUser(request.body.username, request.body.password);
   if (user) {
     request.session.username = user.username;
-    request.session.admin = user.admin;
     response.json({ success: true });
   } else {
     console.log("Login Failed");
@@ -75,14 +99,14 @@ app.post("/api/login", async (request, response) => {
   }
 });
 
-app.post("/api/logout", async (request, response) => {
+app.post("/api/logout", (request, response) => {
   if (!request.session.username) {
     return response.json({ loggedIn: false });
-  } else {
-    request.session.destroy();
+  }
+  request.session.destroy(() => {
     response.clearCookie("connect.sid");
     response.json({ success: true });
-  }
+  });
 });
 
 app.get("/api/user", (request, response) => {
@@ -93,7 +117,13 @@ app.get("/api/user", (request, response) => {
 });
 
 app.post("/api/newMap", async (request, response) => {
-  const mapName = request.body.mapName;
+  if (!request.session.username) {
+    return response.status(401).json({ success: false, message: "Not logged in" });
+  }
+  const mapName = request.body.mapName?.trim();
+  if (!mapName) {
+    return response.status(400).json({ success: false, message: "Map name cannot be empty" });
+  }
   const createdMap = await mapModel.newMap([], mapName, request.session.username);
   response.json({ mapID: createdMap._id, mapName: createdMap.mapName });
 });
@@ -135,11 +165,7 @@ app.delete("/api/deleteMarkerIcon", async (request, response) => {
   }
   const filename = path.basename(imageUrl);
   const filePath = path.join(__dirname, "uploads", filename);
-  try {
-    fs.unlinkSync(filePath);
-  } catch {
-    // File already gone — treat as success
-  }
+  await fs.promises.unlink(filePath).catch(() => {});
   response.json({ success: true });
 });
 
@@ -153,10 +179,16 @@ app.post("/api/uploadImage", (request, response, next) => {
     return response.status(400).json({ success: false, message: "No file uploaded" });
   }
   const imageUrl = `/uploads/${request.file.filename}`;
-  const success = await mapModel.updateImageUrl(request.body.mapID, request.session.username, imageUrl);
-  success
-    ? response.json({ success: true, imageUrl })
-    : response.status(403).json({ success: false });
+  const oldImageUrl = await mapModel.updateImageUrl(request.body.mapID, request.session.username, imageUrl);
+  if (oldImageUrl === null) {
+    await fs.promises.unlink(request.file.path).catch(() => {});
+    return response.status(403).json({ success: false });
+  }
+  if (oldImageUrl?.startsWith("/uploads/")) {
+    const oldPath = path.join(__dirname, oldImageUrl);
+    await fs.promises.unlink(oldPath).catch(() => {});
+  }
+  response.json({ success: true, imageUrl });
 });
 
 app.post("/api/publishMap", async (request, response) => {
@@ -216,11 +248,15 @@ app.patch("/api/renameMap/:id", async (request, response) => {
 });
 
 app.get("/api/getUserMaps", async (request, response) => {
+  if (!request.session.username) {
+    return response.status(401).json({ success: false, message: "Not logged in" });
+  }
   try {
     const maps = await mapModel.sendUsersMaps(request.session.username);
     response.json(maps);
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    response.status(500).json({ success: false, message: "Server error" });
   }
 });
 
@@ -229,17 +265,27 @@ app.get("/api/getAllMaps", async (request, response) => {
     const maps = await mapModel.sendAllMaps();
     response.json(maps);
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    response.status(500).json({ success: false, message: "Server error" });
   }
 });
 
 app.get("/api/getMarkers/:id", async (request, response) => {
   try {
-    const result = await mapModel.sendMarkers(request.params.id);
+    const result = await mapModel.sendMarkers(request.params.id, request.session.username);
+    if (!result) return response.status(403).json({ success: false, message: "Not authorised" });
     response.json(result);
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    response.status(500).json({ success: false, message: "Server error" });
   }
+});
+
+app.use((err, req, res, next) => {
+  if (err?.message === "Only image files are allowed" || err?.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({ success: false, message: err.message });
+  }
+  next(err);
 });
 
 app.listen(3000, () => {

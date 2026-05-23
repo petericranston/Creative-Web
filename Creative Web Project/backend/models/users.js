@@ -4,11 +4,8 @@ const bcrypt = require("bcrypt");
 const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
-  //Making database document layout
-
   username: String,
   password: String,
-  admin: Boolean,
 });
 
 const userData = model("users", userSchema); //Creating scheme for uploading data
@@ -26,7 +23,6 @@ async function registerUser(username, password) {
     await userData.create({
       username: username,
       password: hashedPassword,
-      admin: false,
     });
 
     return true;

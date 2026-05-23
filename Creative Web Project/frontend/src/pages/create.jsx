@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Map from "../components/map";
 import "../styles/create.css";
 
 export default function Create() {
+  const navigate = useNavigate();
   const [markers, setMarkers] = useState([]);
   const [polylines, setPolylines] = useState([]);
   const [selectedMarker, setSelectedMarker] = useState(null);
@@ -62,6 +64,15 @@ export default function Create() {
   const isPublished = currentMap?.isPublished ?? false;
 
   useEffect(() => {
+    async function checkAuth() {
+      const response = await fetch("/api/user", { credentials: "include" });
+      const data = await response.json();
+      if (!data.loggedIn) navigate("/?auth=login", { replace: true });
+    }
+    checkAuth();
+  }, [navigate]);
+
+  useEffect(() => {
     const fetchMaps = async () => {
       const response = await fetch("/api/getUserMaps", {
         credentials: "include",
@@ -85,10 +96,10 @@ export default function Create() {
 
   // ── History ──────────────────────────────────────────────────────────────
 
-  function pushHistory(currentMarkers, currentPolylines) {
+  function pushHistory(currentMarkers, currentPolylines, currentImageUrl) {
     setHistory((prev) => [
       ...prev,
-      { markers: currentMarkers, polylines: currentPolylines, imageUrl },
+      { markers: currentMarkers, polylines: currentPolylines, imageUrl: currentImageUrl },
     ]);
   }
 
@@ -105,14 +116,18 @@ export default function Create() {
   // ── Map CRUD ─────────────────────────────────────────────────────────────
 
   async function newMap() {
+    if (!mapName.trim()) return;
     try {
       const response = await fetch("/api/newMap", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ markers: [], mapName }),
+        body: JSON.stringify({ markers: [], mapName: mapName.trim() }),
       });
-      if (!response.ok) return;
+      if (!response.ok) {
+        alert("Could not create map. Please try again.");
+        return;
+      }
       const data = await response.json();
       setMapID(data.mapID);
       setMarkers([]);
@@ -148,15 +163,20 @@ export default function Create() {
     setContextMenu(null);
     const selectedMap = maps.find((m) => m._id === id);
     setDescription(selectedMap?.description ?? "");
-    const response = await fetch(`/api/getMarkers/${id}`);
-    const data = await response.json();
-    setMarkers(
-      data.markers.map((m) => ({ ...m, clientID: crypto.randomUUID() })),
-    );
-    setPolylines(data.polylines ?? []);
-    setImageUrl(data.imageUrl ?? "");
-    setBgColor(data.bgColor ?? "#111d22");
-    setCustomMarkerTypes(data.customMarkerTypes ?? []);
+    try {
+      const response = await fetch(`/api/getMarkers/${id}`, { credentials: "include" });
+      if (!response.ok) throw new Error(`Failed to load map (${response.status})`);
+      const data = await response.json();
+      setMarkers((data.markers ?? []).map((m) => ({ ...m, clientID: crypto.randomUUID() })));
+      setPolylines(data.polylines ?? []);
+      setImageUrl(data.imageUrl ?? "");
+      setBgColor(data.bgColor ?? "#111d22");
+      setCustomMarkerTypes(data.customMarkerTypes ?? []);
+    } catch (err) {
+      console.error(err);
+      alert("Could not load map. Please try again.");
+      setMapID(undefined);
+    }
   }
 
   async function saveChanges() {
@@ -221,6 +241,7 @@ export default function Create() {
         setImageUrl("");
         setBgColor("#111d22");
         setCustomMarkerTypes([]);
+        setDescription("");
         setIsDirty(false);
         setHistory([]);
       }
@@ -259,8 +280,8 @@ export default function Create() {
 
   // ── Markers ──────────────────────────────────────────────────────────────
 
-  function NewMarker(type, name) {
-    pushHistory(markers, polylines);
+  function addMarker(type, name) {
+    pushHistory(markers, polylines, imageUrl);
     setMarkers((prev) => [
       ...prev,
       { coords: [575, 475], popUp: name, type, clientID: crypto.randomUUID() },
@@ -270,12 +291,12 @@ export default function Create() {
 
   function deleteSelected() {
     if (selectedMarker) {
-      pushHistory(markers, polylines);
+      pushHistory(markers, polylines, imageUrl);
       setMarkers((prev) => prev.filter((m) => m.clientID !== selectedMarker));
       setSelectedMarker(null);
       setIsDirty(true);
     } else if (selectedPolyline !== null) {
-      pushHistory(markers, polylines);
+      pushHistory(markers, polylines, imageUrl);
       setPolylines((prev) => prev.filter((_, i) => i !== selectedPolyline));
       setSelectedPolyline(null);
       setIsDirty(true);
@@ -298,7 +319,7 @@ export default function Create() {
   }
 
   function onMarkerMove(clientID, newCoords) {
-    pushHistory(markers, polylines);
+    pushHistory(markers, polylines, imageUrl);
     setMarkers((prev) =>
       prev.map((m) =>
         m.clientID === clientID ? { ...m, coords: newCoords } : m,
@@ -360,7 +381,7 @@ export default function Create() {
     };
     const customType = customMarkerTypes.find(ct => ct.id === type);
     const defaultName = builtinDefaults[type] ?? customType?.name ?? "Marker";
-    pushHistory(markers, polylines);
+    pushHistory(markers, polylines, imageUrl);
     setMarkers((prev) => [
       ...prev,
       {
@@ -384,7 +405,7 @@ export default function Create() {
   }
 
   function handleFreehandStart(latlng) {
-    pushHistory(markers, polylines);
+    pushHistory(markers, polylines, imageUrl);
     drawingRef.current = [[latlng.lat, latlng.lng]];
     setCurrentDrawPath([[latlng.lat, latlng.lng]]);
   }
@@ -429,7 +450,7 @@ export default function Create() {
     });
     const data = await res.json();
     if (data.success) {
-      pushHistory(markers, polylines);
+      pushHistory(markers, polylines, imageUrl);
       setImageUrl(data.imageUrl);
       setIsDirty(true);
     }
@@ -445,7 +466,7 @@ export default function Create() {
     };
     const customType = customMarkerTypes.find(ct => ct.id === markerType);
     const defaultName = builtinDefaults[markerType] ?? customType?.name ?? "Marker";
-    NewMarker(markerType, markerName.trim() || defaultName);
+    addMarker(markerType, markerName.trim() || defaultName);
     setMarkerName("");
     setMarkerType(null);
     setShowMarkerPopup(false);

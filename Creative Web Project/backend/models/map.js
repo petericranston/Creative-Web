@@ -81,11 +81,10 @@ async function updateDescription(id, username, description) {
 }
 
 async function updateImageUrl(id, username, imageUrl) {
-  const result = await mapData.updateOne(
-    { _id: id, owner: username },
-    { $set: { imageUrl } },
-  );
-  return result.matchedCount === 1;
+  const existing = await mapData.findOne({ _id: id, owner: username }).select("imageUrl").lean();
+  if (!existing) return null;
+  await mapData.updateOne({ _id: id }, { $set: { imageUrl } });
+  return existing.imageUrl || null;
 }
 
 async function sendUsersMaps(username) {
@@ -93,11 +92,13 @@ async function sendUsersMaps(username) {
 }
 
 async function sendAllMaps() {
-  return mapData.find().select("_id mapName owner isPublished description").lean();
+  return mapData.find({ isPublished: true }).select("_id mapName owner description").lean();
 }
 
-async function sendMarkers(id) {
-  const map = await mapData.findById(id).select("markers polylines imageUrl customMarkerTypes bgColor").lean();
+async function sendMarkers(id, username) {
+  const map = await mapData.findById(id).select("markers polylines imageUrl customMarkerTypes bgColor isPublished owner").lean();
+  if (!map) return null;
+  if (!map.isPublished && map.owner !== username) return null;
   return {
     markers: map.markers,
     polylines: map.polylines ?? [],

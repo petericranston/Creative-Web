@@ -2,6 +2,20 @@ import { useState, useEffect } from "react";
 import Map from "../components/map";
 import "../styles/create.css";
 
+function MapButton({ map, activeMapId, onLoad, showOwner }) {
+  return (
+    <li>
+      <button
+        className={activeMapId === map._id ? "active-map" : ""}
+        onClick={() => onLoad(map)}
+      >
+        {map.mapName}
+        {showOwner && <span className="map-owner"> — {map.owner}</span>}
+      </button>
+    </li>
+  );
+}
+
 export default function ViewOthers() {
   const [markers, setMarkers] = useState([]);
   const [polylines, setPolylines] = useState([]);
@@ -28,39 +42,30 @@ export default function ViewOthers() {
 
   async function loadMap(map) {
     setActiveMap(map);
-    const response = await fetch(`/api/getMarkers/${map._id}`);
-    const data = await response.json();
-    setMarkers((data.markers ?? []).map((m) => ({ ...m, clientID: crypto.randomUUID() })));
-    setPolylines(data.polylines ?? []);
-    setImageUrl(data.imageUrl ?? "");
-    setBgColor(data.bgColor ?? "#111d22");
+    try {
+      const response = await fetch(`/api/getMarkers/${map._id}`, { credentials: "include" });
+      if (!response.ok) throw new Error(`Failed to load map (${response.status})`);
+      const data = await response.json();
+      setMarkers((data.markers ?? []).map((m) => ({ ...m, clientID: crypto.randomUUID() })));
+      setPolylines(data.polylines ?? []);
+      setImageUrl(data.imageUrl ?? "");
+      setBgColor(data.bgColor ?? "#111d22");
+    } catch (err) {
+      console.error(err);
+      setActiveMap(null);
+    }
   }
 
-  const publishedMaps = maps.filter((m) => m.isPublished);
   const query = search.toLowerCase();
-  const myMaps = publishedMaps.filter(
+  const myMaps = maps.filter(
     (m) => m.owner === currentUser && m.mapName.toLowerCase().includes(query),
   );
-  const othersMaps = publishedMaps.filter(
+  const othersMaps = maps.filter(
     (m) => m.owner !== currentUser && (
       m.mapName.toLowerCase().includes(query) ||
       m.owner.toLowerCase().includes(query)
     ),
   );
-
-  function MapButton({ map, showOwner }) {
-    return (
-      <li>
-        <button
-          className={activeMap?._id === map._id ? "active-map" : ""}
-          onClick={() => loadMap(map)}
-        >
-          {map.mapName}
-          {showOwner && <span className="map-owner"> — {map.owner}</span>}
-        </button>
-      </li>
-    );
-  }
 
   return (
     <div>
@@ -86,7 +91,7 @@ export default function ViewOthers() {
               <>
                 <h2>My Maps</h2>
                 <ul>
-                  {myMaps.map((map) => <MapButton key={map._id} map={map} showOwner={false} />)}
+                  {myMaps.map((map) => <MapButton key={map._id} map={map} activeMapId={activeMap?._id} onLoad={loadMap} showOwner={false} />)}
                 </ul>
               </>
             )}
@@ -95,7 +100,7 @@ export default function ViewOthers() {
             <ul>
               {othersMaps.length > 0
                 ? othersMaps.map((map) => (
-                    <MapButton key={map._id} map={map} showOwner={true} />
+                    <MapButton key={map._id} map={map} activeMapId={activeMap?._id} onLoad={loadMap} showOwner={true} />
                   ))
                 : <li><p className="empty-msg">No maps published yet.</p></li>
               }

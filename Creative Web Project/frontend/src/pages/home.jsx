@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Map from "../components/map";
 import { getStoredUser, clearStoredUser, storeUser } from "../auth";
 import "../styles/homepage.css";
 
 export default function Home() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(getStoredUser());
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState("login");
@@ -12,6 +13,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const passwordRef = useRef(null);
 
   const [markers] = useState([
     { coords: [370, 780], popUp: "Kings Landing", type: "Capital" },
@@ -85,8 +87,9 @@ export default function Home() {
         );
         return;
       }
-      storeUser(formData.username);
-      setUser(formData.username);
+      const storedName = data.username ?? formData.username;
+      storeUser(storedName);
+      setUser(storedName);
       window.dispatchEvent(new Event("auth-change"));
       closeAuth();
     } catch {
@@ -101,18 +104,48 @@ export default function Home() {
       <header>
         <h1>Myth Mapper</h1>
       </header>
-      <main>
-        {user ? <h2>Welcome, {user}</h2> : <h2>You&apos;re not logged in</h2>}
-        {!user && (
-          <button className="auth-open-btn" onClick={() => openAuth("login")}>
-            Log in / Register
-          </button>
+
+      <main className="hero-content">
+        {user && (
+          <p className="hero-welcome">
+            Welcome back, <strong>{user}</strong>
+          </p>
         )}
-        <h3>Create a map or explore other users worlds!</h3>
+        <p className="hero-tagline">Build worlds. Tell stories.</p>
+        <div className="hero-ctas">
+          {user ? (
+            <>
+              <button className="btn-hero-primary" onClick={() => navigate("/create")}>My Maps</button>
+              <button className="btn-hero-secondary" onClick={() => navigate("/viewOthers")}>Explore Maps</button>
+            </>
+          ) : (
+            <>
+              <button className="btn-hero-primary" onClick={() => openAuth("register")}>Get Started</button>
+              <button className="btn-hero-secondary" onClick={() => openAuth("login")}>Log In</button>
+            </>
+          )}
+        </div>
       </main>
+
       <div className="home-map-wrapper">
+        <span className="map-example-badge">Example map</span>
         <Map data={markers} interactive={false} />
       </div>
+
+      <section className="features">
+        <div className="feature-card">
+          <h3>Create</h3>
+          <p>Draw custom fantasy maps with markers and paths over your own artwork.</p>
+        </div>
+        <div className="feature-card">
+          <h3>Customise</h3>
+          <p>Name settlements, trace roads, and design your own marker types.</p>
+        </div>
+        <div className="feature-card">
+          <h3>Share</h3>
+          <p>Publish your world for others to discover and explore.</p>
+        </div>
+      </section>
 
       {showAuth && (
         <div className="auth-overlay" onClick={closeAuth}>
@@ -153,15 +186,18 @@ export default function Home() {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, username: e.target.value }))
                 }
+                onKeyDown={(e) => e.key === "Enter" && passwordRef.current?.focus()}
                 autoFocus
               />
               <input
+                ref={passwordRef}
                 type="password"
                 placeholder="Password"
                 value={formData.password}
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, password: e.target.value }))
                 }
+                onKeyDown={(e) => e.key === "Enter" && submit(e)}
               />
               {error && <p className="form-error">{error}</p>}
               <button type="submit" disabled={loading}>
